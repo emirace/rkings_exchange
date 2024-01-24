@@ -10,11 +10,13 @@ import {
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
 import merge from 'deepmerge';
-import { View, Text } from 'react-native';
 import React from 'react';
 import useTheme from './context/ThemeContext';
 import { darkTheme, lightTheme } from './constant/theme';
-import MainBottomNav from './navigation/bottom/MainBottomNav';
+import MainStackNav from './navigation/StackNavigation';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { SwapProvider } from './context/SwapContext';
+import { AuthProvider } from './context/AuthContext';
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -35,7 +37,13 @@ const Main = () => {
       <NavigationContainer
         theme={themeMode === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme}
       >
-        <MainBottomNav />
+        <AuthProvider>
+          <SwapProvider>
+            <BottomSheetModalProvider>
+              <MainStackNav />
+            </BottomSheetModalProvider>
+          </SwapProvider>
+        </AuthProvider>
       </NavigationContainer>
     </PaperProvider>
   );

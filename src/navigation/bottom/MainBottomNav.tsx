@@ -1,6 +1,6 @@
 // MainBottomNav.tsx
 import React, { useRef } from 'react';
-import { StyleProp, View, ViewStyle } from 'react-native';
+import { StyleProp, View, ViewStyle, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from 'react-native-paper';
 import Home from '../../screen/Home';
@@ -15,6 +15,7 @@ import { lightTheme } from '../../constant/theme';
 import CustomTabBarButton from '../../component/CustomTabBarButton';
 import BottomNavBar from '../../component/BottomSheetContent/BottomNavBar';
 import { useTheme } from 'react-native-paper';
+import { getResponsiveHeight, getResponsiveWidth } from '../../utils/size';
 
 type TabConfiguration = {
   name: string;
@@ -31,12 +32,12 @@ const tabBarStyle: StyleProp<ViewStyle> = {
   shadowOpacity: 0,
   position: 'absolute',
   borderTopWidth: 0,
-  bottom: 25,
-  left: 20,
-  right: 20,
+  bottom: getResponsiveHeight(25),
+  left: getResponsiveWidth(20),
+  right: getResponsiveWidth(20),
   borderRadius: 20,
-  height: 90,
-  paddingTop: 30,
+  height: getResponsiveHeight(90),
+  paddingTop: getResponsiveHeight(Platform.OS === 'ios' ? 30 : 0),
 };
 
 const tabBarShadowStyle: StyleProp<ViewStyle> = {
@@ -49,7 +50,7 @@ const tabBarShadowStyle: StyleProp<ViewStyle> = {
 
 const tabBarBadgeStyle: StyleProp<ViewStyle> = {
   position: 'absolute',
-  top: -5,
+  top: Platform.OS === 'android' ? 10 : -10,
   right: -5,
   backgroundColor: lightTheme.colors.primary,
 };
@@ -95,61 +96,57 @@ const MainBottomNav: React.FC = () => {
   };
 
   return (
-    <BottomSheetModalProvider>
-      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-        <Tab.Navigator
-          initialRouteName="Home"
-          screenOptions={{
-            tabBarActiveTintColor: lightTheme.colors.primary,
-            tabBarStyle: { ...tabBarStyle, ...tabBarShadowStyle },
-            tabBarShowLabel: false,
-            tabBarBadgeStyle: tabBarBadgeStyle,
-            headerShown: false,
-          }}
-        >
-          {tabConfigurations.map((config) => (
-            <Tab.Screen
-              key={config.name}
-              name={config.name}
-              component={config.component}
-              options={{
-                tabBarIcon: ({ color, focused }) => (
-                  <Icon
-                    source={
-                      focused
-                        ? config.iconSource
-                        : `${config.iconSource}-outline`
-                    }
-                    color={color}
-                    size={30}
-                  />
-                ),
-                tabBarBadge: config.badge,
-                tabBarButton: config.floatingButton
-                  ? () => <CustomTabBarButton onPress={openBottomSheet} />
-                  : undefined,
-              }}
-            />
-          ))}
-        </Tab.Navigator>
+    <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          tabBarActiveTintColor: lightTheme.colors.primary,
+          tabBarStyle: { ...tabBarStyle, ...tabBarShadowStyle },
+          tabBarShowLabel: false,
+          tabBarBadgeStyle: tabBarBadgeStyle,
+          headerShown: false,
+        }}
+      >
+        {tabConfigurations.map((config) => (
+          <Tab.Screen
+            key={config.name}
+            name={config.name}
+            component={config.component}
+            options={{
+              tabBarIcon: ({ color, focused }) => (
+                <Icon
+                  source={
+                    focused ? config.iconSource : `${config.iconSource}-outline`
+                  }
+                  color={color}
+                  size={getResponsiveHeight(30)}
+                />
+              ),
+              tabBarBadge: config.badge,
+              tabBarButton: config.floatingButton
+                ? () => <CustomTabBarButton onPress={openBottomSheet} />
+                : undefined,
+            }}
+          />
+        ))}
+      </Tab.Navigator>
 
-        {/* Bottom Sheet */}
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          index={0}
-          snapPoints={['50%']}
-          backgroundStyle={{
-            backgroundColor: colors.elevation.level1,
-          }}
-          // style={{ ...tabBarShadowStyle }}
-          handleIndicatorStyle={{
-            backgroundColor: lightTheme.colors.primary,
-          }}
-        >
-          <BottomNavBar />
-        </BottomSheetModal>
-      </View>
-    </BottomSheetModalProvider>
+      {/* Bottom Sheet */}
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={['50%']}
+        backgroundStyle={{
+          backgroundColor: colors.elevation.level1,
+        }}
+        // style={{ ...tabBarShadowStyle }}
+        handleIndicatorStyle={{
+          backgroundColor: lightTheme.colors.primary,
+        }}
+      >
+        <BottomNavBar />
+      </BottomSheetModal>
+    </View>
   );
 };
 

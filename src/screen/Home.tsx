@@ -1,13 +1,22 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Appbar, Avatar, useTheme } from 'react-native-paper';
+import {
+  Appbar,
+  Avatar,
+  Button,
+  Icon,
+  IconButton,
+  useTheme,
+} from 'react-native-paper';
 import Logo from '../component/Logo';
 import WalletCard from '../component/home/WalletCard';
 import TodayRate from '../component/home/TodayRate';
 import { getResponsiveHeight, getResponsiveWidth } from '../utils/size';
-import { HomeScreenNavigationProp } from '../type/navigation';
+import { HomeScreenNavigationProp } from '../type/navigation/stackNav';
+import useAuth from '../context/AuthContext';
 
 const Home: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
+  const { user } = useAuth();
   const { colors } = useTheme();
 
   return (
@@ -20,15 +29,27 @@ const Home: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
         }}
       >
         <Logo />
-        <Avatar.Image
-          size={getResponsiveHeight(50)}
-          source={{
-            uri: 'https://png.pngtree.com/png-vector/20220709/ourmid/pngtree-businessman-user-avatar-wearing-suit-with-red-tie-png-image_5809521.png',
-          }}
-        />
+        {user ? (
+          <Button>
+            <Avatar.Image
+              size={getResponsiveHeight(50)}
+              source={{
+                uri: user.image,
+              }}
+            />
+          </Button>
+        ) : // <IconButton
+        //   icon={'login-variant'}
+        //   size={30}
+        //   onPress={() => navigation.navigate('Auth')}
+        // />
+        null}
       </Appbar.Header>
-      <WalletCard navigation={navigation} route={route} />
-      <TodayRate />
+      <TodayRate
+        navigation={navigation}
+        route={route}
+        headerComp={<WalletCard navigation={navigation} />}
+      />
     </View>
   );
 };

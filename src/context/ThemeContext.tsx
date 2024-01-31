@@ -10,7 +10,10 @@ import { useColorScheme } from 'react-native';
 
 type ThemeContextType = {
   themeMode: 'dark' | 'light';
+  selectedThemeMode: 'system' | 'dark' | 'light';
   toggleTheme: (value: 'system' | 'dark' | 'light') => void;
+  scrollY: number;
+  setScrollY: (value: number) => void;
 };
 
 interface Props {
@@ -20,7 +23,9 @@ interface Props {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<Props> = ({ children }) => {
+  const [scrollY, setScrollY] = useState<number>(0);
   const colorScheme = useColorScheme();
+
   const loadThemeMode = async () => {
     try {
       const storedThemeMode = await SecureStore.getItemAsync(
@@ -72,7 +77,9 @@ export const ThemeProvider: React.FC<Props> = ({ children }) => {
   }, [selectedThemeMode]);
 
   return (
-    <ThemeContext.Provider value={{ themeMode, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ themeMode, toggleTheme, scrollY, setScrollY, selectedThemeMode }}
+    >
       {children}
     </ThemeContext.Provider>
   );

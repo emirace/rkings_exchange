@@ -1,13 +1,85 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
+import { Divider, Icon, Text, useTheme } from 'react-native-paper';
+import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
 
-const BottomNavBar: React.FC = () => {
+interface BottomNavbarProps extends HomeScreenNavigationProp {
+  onClose: () => void;
+}
+
+const BottomNavBar: React.FC<BottomNavbarProps> = ({ navigation, onClose }) => {
+  const { colors } = useTheme();
+
+  const handleNavigation = (
+    screen: 'Buy' | 'Sell' | 'Exchange' | 'Deposit'
+  ) => {
+    navigation.navigate(screen);
+    onClose();
+  };
+
+  const renderNavItem = (
+    screen: 'Buy' | 'Sell' | 'Exchange' | 'Deposit',
+    icon: string,
+    title: string,
+    description: string
+  ) => (
+    <TouchableOpacity
+      style={styles.navItemContainer}
+      onPress={() => handleNavigation(screen)}
+    >
+      <Icon size={30} color={colors.primary} source={icon} />
+      <View style={styles.navItemText}>
+        <Text
+          variant="displaySmall"
+          style={{
+            fontSize: getResponsiveFontSize(25),
+            fontWeight: '600',
+          }}
+        >
+          {title}
+        </Text>
+        <Text style={{ opacity: 0.5 }}>{description}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <View style={{ flex: 1 }}>
-      <Text>Bottom Sheet Content Goes Here</Text>
-      {/* Include any additional components or views you want to display */}
+    <View style={styles.container}>
+      {renderNavItem('Buy', 'plus-circle', 'Buy', 'Buy crypto')}
+      <Divider style={styles.divider} />
+      {renderNavItem('Sell', 'minus-circle', 'Sell', 'Sell crypto')}
+      <Divider style={styles.divider} />
+      {renderNavItem(
+        'Exchange',
+        'plus-circle',
+        'Exchange',
+        'Exchange one crypto for another'
+      )}
+      <Divider style={styles.divider} />
+      {renderNavItem('Deposit', 'plus-circle', 'Deposit', 'Fund your wallet')}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingBottom: getResponsiveHeight(20),
+  },
+  navItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: getResponsiveHeight(25),
+  },
+  navItemText: {
+    flex: 1,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(0, 0, 0, 0.12)',
+  },
+});
 
 export default BottomNavBar;

@@ -2,6 +2,7 @@
 import { UpdateFields, User } from '../type/user';
 import { getBackendErrorMessage } from '../utils/error';
 import api from './api';
+import * as SecureStore from 'expo-secure-store';
 
 export async function sendVerifyEmailService(userData: {
   email: string;
@@ -114,7 +115,7 @@ export async function loginUser(credentials: {
     }
     console.log(data.accessToken);
 
-    localStorage.setItem('authToken', data.accessToken);
+    await SecureStore.setItemAsync('authToken', data.accessToken);
 
     return data.accessToken;
   } catch (error) {
@@ -136,8 +137,8 @@ export async function getUserService(): Promise<User> {
       throw new Error('Login failed: ' + getBackendErrorMessage(data.data));
     }
 
-    localStorage.setItem('email', data.user.email);
-    localStorage.setItem('username', data.user.username);
+    await SecureStore.setItemAsync('email', data.user.email);
+    await SecureStore.setItemAsync('username', data.user.username);
     return data.user;
   } catch (error) {
     // Handle network errors or other exceptions
@@ -250,7 +251,7 @@ export async function logoutUser(): Promise<void> {
       throw new Error('Logout failed: ' + getBackendErrorMessage(data.data));
     }
 
-    localStorage.removeItem('authToken');
+    SecureStore.deleteItemAsync('authToken');
   } catch (error) {
     // Handle network errors or other exceptions
     // You can log the error or perform other error-handling actions

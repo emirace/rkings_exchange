@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// walletService.js
 
 import { SystemWalletData } from '../type/wallet';
 import { getBackendErrorMessage } from '../utils/error';

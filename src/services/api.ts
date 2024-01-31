@@ -3,9 +3,12 @@ import axios, {
   AxiosError,
   InternalAxiosRequestConfig,
 } from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 // export const baseURL = ''; // Replace with your API base URL
-export const baseURL = 'http://192.168.43.11:5000'; // Replace with your API base URL
+// export const baseURL = 'http://192.168.43.11:5000'; // Replace with your API base URL
+export const baseURL = 'http://172.20.10.2:5000'; // Replace with your API base URL
+// export const baseURL = 'https://www.repeddle.com'; // Replace with your API base URL
 
 // Create an instance of Axios with custom configurations if needed
 const api = axios.create({
@@ -21,9 +24,9 @@ const api = axios.create({
 
 // Interceptors for handling requests and responses
 api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
     // You can modify the request config here (e.g., add authentication headers)
-    const token = localStorage.getItem('authToken');
+    const token = await SecureStore.getItemAsync('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

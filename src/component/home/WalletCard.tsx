@@ -1,16 +1,17 @@
 import { View } from 'react-native';
 import React from 'react';
-import { Button, Icon, Text, useTheme } from 'react-native-paper';
+import { Button, Icon, IconButton, Text, useTheme } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
-import { HomeScreenNavigationProp } from '../../type/navigation';
+import useAuth from '../../context/AuthContext';
 
-const WalletCard: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
+const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
-  const handleCardPress = () => {
-    navigation.navigate('Buy');
+  const { user } = useAuth();
+  const handleCardPress = (value: 'Buy' | 'Sell') => {
+    navigation.navigate(value);
   };
-  return (
+  return user ? (
     <LinearGradient
       colors={[colors.primary, 'black']}
       start={{ x: 0.3, y: 0.5 }}
@@ -27,26 +28,43 @@ const WalletCard: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
         justifyContent: 'space-between',
       }}
     >
-      <View>
-        <Text
-          //   variant="titleLarge"
-          style={{
-            color: colors.onPrimary,
-            fontSize: getResponsiveFontSize(22),
-          }}
-        >
-          Current Balance
-        </Text>
-        <Text
-          //   variant="displayMedium"
-          style={{
-            color: colors.onPrimary,
-            fontWeight: '600',
-            fontSize: getResponsiveFontSize(45),
-          }}
-        >
-          $21983890.00
-        </Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <View>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <Text
+              //   variant="titleLarge"
+              style={{
+                color: colors.onPrimary,
+                fontSize: getResponsiveFontSize(22),
+              }}
+            >
+              Current Balance
+            </Text>
+            <Icon source={'eye'} size={20} color="white" />
+          </View>
+          <Text
+            //   variant="displayMedium"
+            style={{
+              color: colors.onPrimary,
+              fontWeight: '600',
+              fontSize: getResponsiveFontSize(45),
+            }}
+          >
+            $21983890.00
+          </Text>
+        </View>
+        <IconButton
+          icon={'chevron-right'}
+          size={30}
+          iconColor="white"
+          onPress={() => navigation.navigate('Wallet')}
+        />
       </View>
       <View
         style={{
@@ -89,7 +107,7 @@ const WalletCard: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               fontSize: getResponsiveFontSize(20),
             }}
             rippleColor={colors.primaryContainer}
-            onPress={handleCardPress}
+            onPress={() => handleCardPress('Buy')}
           >
             Buy
           </Button>
@@ -101,10 +119,76 @@ const WalletCard: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               fontWeight: '600',
               fontSize: getResponsiveFontSize(20),
             }}
+            onPress={() => handleCardPress('Sell')}
           >
             Sell
           </Button>
         </View>
+      </View>
+    </LinearGradient>
+  ) : (
+    <LinearGradient
+      colors={[colors.primary, 'black']}
+      start={{ x: 0.3, y: 0.5 }}
+      style={{
+        backgroundColor: colors.primary,
+        height: getResponsiveHeight(150),
+        borderRadius: 30,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 5,
+        padding: 20,
+        justifyContent: 'space-between',
+      }}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+        }}
+      >
+        <View>
+          <Text
+            style={{
+              color: colors.onPrimary,
+              fontWeight: '600',
+              fontSize: getResponsiveFontSize(30),
+            }}
+          >
+            Start your journey
+          </Text>
+          <Text
+            style={{
+              color: colors.onPrimary,
+              fontSize: getResponsiveFontSize(18),
+            }}
+          >
+            Unlock a world of possibilities with{' '}
+            <Text style={{ fontWeight: 'bold', color: 'white' }}>
+              Rkings Exchange
+            </Text>
+            .
+          </Text>
+          <Text
+            style={{
+              color: colors.onPrimary,
+              fontSize: getResponsiveFontSize(18),
+              marginTop: 5,
+            }}
+          >
+            Log in to begin
+          </Text>
+        </View>
+        <IconButton
+          icon={'login'}
+          size={30}
+          iconColor="white"
+          onPress={() => navigation.navigate('Auth')}
+        />
       </View>
     </LinearGradient>
   );

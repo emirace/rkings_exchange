@@ -17,6 +17,10 @@ import MainStackNav from './navigation/StackNavigation';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SwapProvider } from './context/SwapContext';
 import { AuthProvider } from './context/AuthContext';
+import { DepositProvider } from './context/DepositContext';
+import { PageProvider } from './context/PageContext';
+import { OrderProvider } from './context/OrderContext';
+import { WalletProvider } from './context/WalletContext';
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -39,9 +43,17 @@ const Main = () => {
       >
         <AuthProvider>
           <SwapProvider>
-            <BottomSheetModalProvider>
-              <MainStackNav />
-            </BottomSheetModalProvider>
+            <DepositProvider>
+              <PageProvider>
+                <OrderProvider>
+                  <WalletProvider>
+                    <BottomSheetModalProvider>
+                      <MainStackNav />
+                    </BottomSheetModalProvider>
+                  </WalletProvider>
+                </OrderProvider>
+              </PageProvider>
+            </DepositProvider>
           </SwapProvider>
         </AuthProvider>
       </NavigationContainer>

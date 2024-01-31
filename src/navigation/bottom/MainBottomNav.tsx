@@ -16,6 +16,9 @@ import CustomTabBarButton from '../../component/CustomTabBarButton';
 import BottomNavBar from '../../component/BottomSheetContent/BottomNavBar';
 import { useTheme } from 'react-native-paper';
 import { getResponsiveHeight, getResponsiveWidth } from '../../utils/size';
+import CustomBackdrop from '../../component/CustomBackdrop';
+import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
+import usePage from '../../context/PageContext';
 
 type TabConfiguration = {
   name: string;
@@ -85,13 +88,23 @@ const tabConfigurations: TabConfiguration[] = [
   },
 ];
 
-const MainBottomNav: React.FC = () => {
+const MainBottomNav: React.FC<HomeScreenNavigationProp> = ({
+  navigation,
+  route,
+}) => {
+  const { scrollY } = usePage();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const { colors } = useTheme();
 
   const openBottomSheet = () => {
     if (bottomSheetModalRef.current) {
       bottomSheetModalRef.current.present();
+    }
+  };
+
+  const closeBottomSheet = () => {
+    if (bottomSheetModalRef.current) {
+      bottomSheetModalRef.current.close();
     }
   };
 
@@ -135,7 +148,7 @@ const MainBottomNav: React.FC = () => {
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
-        snapPoints={['50%']}
+        snapPoints={['55%']}
         backgroundStyle={{
           backgroundColor: colors.elevation.level1,
         }}
@@ -143,8 +156,14 @@ const MainBottomNav: React.FC = () => {
         handleIndicatorStyle={{
           backgroundColor: lightTheme.colors.primary,
         }}
+        backdropComponent={(props) => <CustomBackdrop {...props} />}
+        // enableDynamicSizing={true}
       >
-        <BottomNavBar />
+        <BottomNavBar
+          route={route}
+          navigation={navigation}
+          onClose={closeBottomSheet}
+        />
       </BottomSheetModal>
     </View>
   );

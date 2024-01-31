@@ -7,7 +7,11 @@ import {
   getResponsiveWidth,
 } from '../utils/size';
 
-const Logo = () => {
+interface Props {
+  text?: boolean;
+}
+
+const Logo: React.FC<Props> = ({ text = true }) => {
   const { colors } = useTheme();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
@@ -20,15 +24,17 @@ const Logo = () => {
         }}
         alt="logo"
       />
-      <Text
-        style={{
-          fontSize: getResponsiveFontSize(25),
-          fontWeight: '800',
-          color: colors.primary,
-        }}
-      >
-        Kings Exchange
-      </Text>
+      {text && (
+        <Text
+          style={{
+            fontSize: getResponsiveFontSize(25),
+            fontWeight: '800',
+            color: colors.primary,
+          }}
+        >
+          Kings Exchange
+        </Text>
+      )}
     </View>
   );
 };

@@ -7,13 +7,13 @@ import {
   getResponsiveWidth,
 } from '../utils/size';
 import { Appbar, useTheme, Text, Icon, Button } from 'react-native-paper';
-import { ExchangeNavigationProp } from '../type/navigation';
-import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import List from '../component/exchange/List';
 import Confirm from '../component/exchange/Confirm';
 import { useSwap } from '../context/SwapContext';
 import { Wallet } from '../type/wallet';
 import CustomBackdrop from '../component/CustomBackdrop';
+import { ExchangeNavigationProp } from '../type/navigation/stackNav';
 
 const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
   const {
@@ -202,6 +202,7 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
         handleIndicatorStyle={{
           backgroundColor: colors.primary,
         }}
+        backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
         <List onSelect={handleWalletChange} position={editing} />
       </BottomSheetModal>

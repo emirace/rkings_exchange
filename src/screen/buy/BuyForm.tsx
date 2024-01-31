@@ -10,6 +10,7 @@ import {
   Text,
   Icon,
   useTheme,
+  Modal,
 } from 'react-native-paper';
 import { Wallet } from '../../type/wallet';
 import List from '../../component/exchange/List';
@@ -40,6 +41,7 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
   const [exchange, setExchange] = useState(0);
   const [exchangeLoading, setExchangeLoading] = useState(true);
   const cursorAnimation = useRef(new Animated.Value(0)).current;
+  const [visible, setVisible] = React.useState(false);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef2 = useRef<BottomSheetModal>(null);
@@ -85,6 +87,8 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
     inputRange: [0, 1],
     outputRange: [0, 2],
   });
+
+  const hideModal = () => setVisible(false);
 
   useEffect(() => {
     const getExchange = async () => {
@@ -275,6 +279,15 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
           </Button>
         </View>
       </View>
+
+      <Modal
+        visible={true}
+        onDismiss={hideModal}
+        contentContainerStyle={[{ backgroundColor: colors.background }]}
+      >
+        <Icon source={'message-alert'} size={50} color={colors.onBackground} />
+        <Text>Example Modal. Click outside this area to dismiss.</Text>
+      </Modal>
 
       <BottomSheetModal
         ref={bottomSheetModalRef}

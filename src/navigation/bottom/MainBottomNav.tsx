@@ -19,12 +19,13 @@ import { getResponsiveHeight, getResponsiveWidth } from '../../utils/size';
 import CustomBackdrop from '../../component/CustomBackdrop';
 import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
 import usePage from '../../context/PageContext';
+import useCart from '../../context/CartContext';
 
 type TabConfiguration = {
   name: string;
   component: React.ComponentType<any>;
   iconSource: string;
-  badge?: number;
+  badge?: any;
   floatingButton?: boolean;
 };
 
@@ -58,41 +59,11 @@ const tabBarBadgeStyle: StyleProp<ViewStyle> = {
   backgroundColor: lightTheme.colors.primary,
 };
 
-const tabConfigurations: TabConfiguration[] = [
-  {
-    name: 'Home',
-    component: Home,
-    iconSource: 'home',
-  },
-  {
-    name: 'Store',
-    component: Store,
-    iconSource: 'store',
-    badge: 3,
-  },
-  {
-    name: 'FloatingButton',
-    component: Home,
-    iconSource: 'plus',
-    floatingButton: true,
-  },
-  {
-    name: 'Wallet',
-    component: Wallet,
-    iconSource: 'wallet',
-  },
-  {
-    name: 'Setting',
-    component: Settings,
-    iconSource: 'cog',
-  },
-];
-
 const MainBottomNav: React.FC<HomeScreenNavigationProp> = ({
   navigation,
   route,
 }) => {
-  const { scrollY } = usePage();
+  const { cart } = useCart();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const { colors } = useTheme();
 
@@ -107,6 +78,36 @@ const MainBottomNav: React.FC<HomeScreenNavigationProp> = ({
       bottomSheetModalRef.current.close();
     }
   };
+
+  const tabConfigurations: TabConfiguration[] = [
+    {
+      name: 'Home',
+      component: Home,
+      iconSource: 'home',
+    },
+    {
+      name: 'Store',
+      component: Store,
+      iconSource: 'store',
+      badge: cart.length || null,
+    },
+    {
+      name: 'FloatingButton',
+      component: Home,
+      iconSource: 'plus',
+      floatingButton: true,
+    },
+    {
+      name: 'Wallet',
+      component: Wallet,
+      iconSource: 'wallet',
+    },
+    {
+      name: 'Setting',
+      component: Settings,
+      iconSource: 'cog',
+    },
+  ];
 
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end' }}>

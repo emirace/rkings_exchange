@@ -16,19 +16,12 @@ import Filter from '../../component/Filter';
 import CustomBackdrop from '../../component/CustomBackdrop';
 import ProductItem from '../../component/ProductItem';
 import { SearchNavigationProp } from '../../type/navigation/stackNav';
-
-// Sample data (replace with your actual data)
-const products: ProductProps[] = [
-  { _id: '1', name: 'Product 1', category: 'Category A' },
-  { _id: '2', name: 'Product 2', category: 'Category B' },
-  { _id: '3', name: 'Product 3', category: 'Category A' },
-  { _id: '4', name: 'Product 3', category: 'Category A' },
-  { _id: '5', name: 'Product 3', category: 'Category A' },
-  { _id: '6', name: 'Product 3', category: 'Category A' },
-  // Add more products as needed
-];
+import { useProduct } from '../../context/ProductContext';
+import useCart from '../../context/CartContext';
 
 const Search: React.FC<SearchNavigationProp> = ({ navigation, route }) => {
+  const { cart } = useCart();
+  const { products } = useProduct();
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
@@ -82,7 +75,9 @@ const Search: React.FC<SearchNavigationProp> = ({ navigation, route }) => {
           }}
         >
           <Appbar.Action icon="cart" />
-          <Badge style={{ position: 'absolute' }}>3</Badge>
+          {cart.length > 0 && (
+            <Badge style={{ position: 'absolute' }}>{cart.length}</Badge>
+          )}
         </TouchableOpacity>
       </Appbar.Header>
       <View style={styles.contentContainer}>

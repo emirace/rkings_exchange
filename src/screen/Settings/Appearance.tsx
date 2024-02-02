@@ -25,12 +25,13 @@ const Appearance: React.FC<AppearanceNavigationProp> = ({ navigation }) => {
     <View>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title="Appearance" />
+        <Appbar.Content title="Theme" />
       </Appbar.Header>
       <View style={{ paddingHorizontal: getResponsiveWidth(20) }}>
         {options.map((option) => (
           <Checkbox.Item
             label={option}
+            key={option}
             labelStyle={{ fontSize: getResponsiveFontSize(22) }}
             status={
               selectedThemeMode === option.toLowerCase()

@@ -3,6 +3,7 @@ import { ProductProps } from '../type/product';
 import { Card, Icon, IconButton, Text, useTheme } from 'react-native-paper';
 import { getResponsiveHeight, getResponsiveWidth } from '../utils/size';
 import { HomeScreenNavigationProp } from '../type/navigation/stackNav';
+import { baseURL } from '../services/api';
 
 interface Props {
   item: ProductProps;
@@ -22,7 +23,7 @@ const ProductItem: React.FC<Props> = ({ item, index, navigation }) => {
       <Pressable onPress={handleClick}>
         <Image
           source={{
-            uri: 'https://ng.jumia.is/unsafe/fit-in/680x680/filters:fill(white)/product/74/4192691/1.jpg?4291',
+            uri: baseURL + item.images[0],
           }}
           style={{ height: '100%' }}
         />
@@ -58,14 +59,18 @@ const ProductItem: React.FC<Props> = ({ item, index, navigation }) => {
         <View>
           <Text
             numberOfLines={1}
-            style={{ fontWeight: '600', marginBottom: 5 }}
+            style={{
+              fontWeight: '600',
+              marginBottom: 5,
+              width: getResponsiveWidth(100),
+            }}
           >
             {item.name}
           </Text>
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <Text>${item.sellingPrice}</Text>
             <Text style={{ opacity: 0.5, textDecorationLine: 'line-through' }}>
-              ${item.sellingPrice}
+              ${item.costPrice}
             </Text>
           </View>
         </View>

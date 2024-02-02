@@ -19,10 +19,14 @@ import { ProductProps } from '../../type/product';
 import ProductItem from '../../component/ProductItem';
 import usePage from '../../context/PageContext';
 import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
+import { useProduct } from '../../context/ProductContext';
+import useCart from '../../context/CartContext';
 
 const products: ProductProps[] = [];
 
 const Store: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
+  const { cart } = useCart();
+  const { products } = useProduct();
   const { setScrollY } = usePage();
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,31 +34,31 @@ const Store: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1); // Initial page
 
-  const loadMoreData = () => {
-    // Simulate fetching more data, replace with your actual logic
-    setLoading(true);
-    // Replace the setTimeout with your actual data fetching logic
-    setTimeout(() => {
-      // For demonstration, let's add more dummy products
-      const moreProducts: ProductProps[] = Array.from(
-        { length: 5 },
-        (_, index) => ({
-          _id: `new-${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`,
-          name: `New Product ${index + 1}`,
-          sellingPrice: 25 + index,
-          costPrice: 25 + index,
-          images: [],
-        })
-      );
-      setData((prevData) => [...prevData, ...moreProducts]);
-      setLoading(false);
-    }, 1000);
-  };
+  // const loadMoreData = () => {
+  //   // Simulate fetching more data, replace with your actual logic
+  //   setLoading(true);
+  //   // Replace the setTimeout with your actual data fetching logic
+  //   setTimeout(() => {
+  //     // For demonstration, let's add more dummy products
+  //     const moreProducts: ProductProps[] = Array.from(
+  //       { length: 5 },
+  //       (_, index) => ({
+  //         _id: `new-${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`,
+  //         name: `New Product ${index + 1}`,
+  //         sellingPrice: 25 + index,
+  //         costPrice: 25 + index,
+  //         images: [],
+  //       })
+  //     );
+  //     setData((prevData) => [...prevData, ...moreProducts]);
+  //     setLoading(false);
+  //   }, 1000);
+  // };
 
-  useEffect(() => {
-    // Load more data when the page changes
-    loadMoreData();
-  }, [page]);
+  // useEffect(() => {
+  //   // Load more data when the page changes
+  //   loadMoreData();
+  // }, [page]);
 
   const handleScroll = (event: any) => {
     // Update scrollY value in the context
@@ -101,23 +105,24 @@ const Store: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
             }}
           >
             <Appbar.Action icon="cart" />
-            <Badge style={{ position: 'absolute' }}>3</Badge>
+            {cart.length > 0 && (
+              <Badge style={{ position: 'absolute' }}>{cart.length}</Badge>
+            )}
           </TouchableOpacity>
         </View>
       </Appbar.Header>
       <FlatList
-        data={data}
+        data={products}
         keyExtractor={(item) => item._id}
         renderItem={({ item, index }) => (
           <ProductItem item={item} index={index} navigation={navigation} />
         )}
         numColumns={2}
-        onEndReached={() => setPage((prevPage) => prevPage + 1)}
-        onEndReachedThreshold={0.1}
+        // onEndReached={() => setPage((prevPage) => prevPage + 1)}
+        // onEndReachedThreshold={0.1}
         ListHeaderComponent={headerComp}
-        ListFooterComponent={loading ? <ActivityIndicator animating /> : null}
-        // onScroll={handleScroll}
-        // scrollEventThrottle={16}
+        // ListFooterComponent={loading ? <ActivityIndicator animating /> : null}
+        style={{ paddingBottom: getResponsiveHeight(200), flex: 1 }}
       />
     </View>
   );

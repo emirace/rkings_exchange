@@ -1,6 +1,12 @@
 import React, { ReactElement } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import { Card, Avatar, Text, useTheme } from 'react-native-paper';
+import {
+  Card,
+  Avatar,
+  Text,
+  useTheme,
+  ActivityIndicator,
+} from 'react-native-paper';
 import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
 import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
 import { useWallet } from '../../context/WalletContext';
@@ -41,10 +47,14 @@ const TodayRate: React.FC<Props> = ({ headerComp, navigation }) => {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text>Loaing</Text>
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
       ) : (
         <FlatList
-          data={systemWallets}
+          data={systemWallets.filter((wal) => wal.type === 'Crypto')}
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}

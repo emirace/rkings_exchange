@@ -7,8 +7,8 @@ import * as SecureStore from 'expo-secure-store';
 
 // export const baseURL = ''; // Replace with your API base URL
 // export const baseURL = 'http://192.168.43.11:5000'; // Replace with your API base URL
-export const baseURL = 'http://172.20.10.2:5000'; // Replace with your API base URL
-// export const baseURL = 'https://www.repeddle.com'; // Replace with your API base URL
+// export const baseURL = 'http://172.20.10.2:5000'; // Replace with your API base URL
+export const baseURL = 'https://www.rkingsexchange.com'; // Replace with your API base URL
 
 // Create an instance of Axios with custom configurations if needed
 const api = axios.create({

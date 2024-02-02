@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -14,6 +14,8 @@ import {
   useTheme,
   Icon,
   Chip,
+  ActivityIndicator,
+  Badge,
 } from 'react-native-paper';
 import {
   getResponsiveFontSize,
@@ -21,28 +23,63 @@ import {
   getResponsiveWidth,
 } from '../../utils/size';
 import { ProductDetailNavigationProp } from '../../type/navigation/stackNav';
+import { ProductProps } from '../../type/product';
+import { useProduct } from '../../context/ProductContext';
+import useCart from '../../context/CartContext';
+import useToastNotification from '../../context/ToastNotificationContext';
+import { baseURL } from '../../services/api';
 
 const ProductDetail: React.FC<ProductDetailNavigationProp> = ({
   navigation,
+  route,
 }) => {
+  const id = route.params.productId;
   const { colors } = useTheme();
+  const { fetchProductById } = useProduct();
+  const { addNotification } = useToastNotification();
+  const { addToCart, cart } = useCart();
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  // Sample product details
-  const product = {
-    name: 'Sample Product',
-    images: [
-      'https://placekitten.com/600/400', // Sample image URLs
-      'https://placekitten.com/601/400', // Add more image URLs as needed
-      'https://placekitten.com/602/400',
-    ],
-    sizeOptions: ['S', 'M', 'L', 'XL'],
-    colorOptions: ['Red', 'Blue', 'Green', 'Yellow'],
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    price: 49.99,
-    category: 'Clothing',
-    brand: 'Example Brand',
-    tags: ['Fashion', 'Casual', 'Summer'],
+  const [product, setProduct] = useState<ProductProps | null>(null);
+  const [loadingPage, setLoadingPage] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (id) {
+        const currentProduct = await fetchProductById(id);
+
+        if (currentProduct) {
+          setProduct(currentProduct);
+        }
+        setLoadingPage(false);
+      } else {
+        setProduct(null);
+        setLoadingPage(false);
+      }
+    }
+    fetchData();
+  }, [id]);
+
+  const gotoCart = () => {
+    navigation.navigate('Cart');
+  };
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    // if (quantity < 1) {
+    //   addNotification('Select a valid quantity');
+    //   return;
+    // }
+    if (product?.sizes?.length && !selectedSize) {
+      addNotification('Select prefered size');
+      return;
+    }
+    if (product?.colors?.length && !selectedColor) {
+      addNotification('Select prefered color');
+      return;
+    }
+    addToCart({ ...product, quantity: 1, selectedSize, selectedColor });
+    addNotification('Item added to cart', 'Checkout', gotoCart);
   };
 
   return (
@@ -55,130 +92,170 @@ const ProductDetail: React.FC<ProductDetailNavigationProp> = ({
         }}
       >
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Action
-          icon="heart"
-          color={colors.primary}
-          containerColor={colors.background}
-        />
-      </Appbar.Header>
-      <Image source={{ uri: product.images[0] }} style={styles.image} />
-      <ScrollView style={styles.contentContainer}>
-        <View
-          style={[styles.contentbody, { backgroundColor: colors.background }]}
-        >
-          <Text style={styles.productName}>{product.name}</Text>
-          <View style={styles.chipContainer}>
-            {product.tags.map((tag) => (
-              <Chip
-                key={tag}
-                mode="outlined"
-                icon="tag"
-                style={styles.chip}
-                selectedColor={colors.primary}
-                onPress={() => navigation.navigate('Search', { query: '' })}
-              >
-                {tag}
-              </Chip>
-            ))}
-          </View>
-          <View
-            style={{
-              marginBottom: getResponsiveHeight(20),
-              flexDirection: 'row',
-              gap: getResponsiveWidth(40),
-            }}
-          >
-            <View style={{}}>
-              <Text>Category</Text>
-              <Text style={[styles.price]}>{product.category}</Text>
-            </View>
 
-            <View>
-              <Text>Brand</Text>
-              <Text style={[styles.price]}>{product.brand}</Text>
-            </View>
-          </View>
-          <Divider />
-          <Text style={styles.label}>Size</Text>
-          <View style={styles.optionsContainer}>
-            {product.sizeOptions.map((size) => (
-              <TouchableOpacity
-                key={size}
-                onPress={() => setSelectedSize(size)}
-                style={[
-                  styles.optionButton,
-                  {
-                    backgroundColor: colors.elevation.level3,
-                    borderWidth: 1,
-                    borderColor:
-                      selectedSize === size ? colors.primary : colors.backdrop,
-                  },
-                ]}
+        <TouchableOpacity
+          style={{ position: 'relative' }}
+          onPress={() => {
+            navigation.navigate('Cart');
+          }}
+        >
+          <Appbar.Action icon="cart" />
+          {cart.length > 0 && (
+            <Badge style={{ position: 'absolute' }}>{cart.length}</Badge>
+          )}
+        </TouchableOpacity>
+      </Appbar.Header>
+      {loadingPage ? (
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <ActivityIndicator />
+        </View>
+      ) : !product ? (
+        <View>
+          <Text>Product not found</Text>
+        </View>
+      ) : (
+        <>
+          <Image
+            source={{ uri: baseURL + product.images[0] }}
+            style={styles.image}
+          />
+          <ScrollView style={styles.contentContainer}>
+            <View
+              style={[
+                styles.contentbody,
+                { backgroundColor: colors.background },
+              ]}
+            >
+              <Text style={styles.productName}>{product.name}</Text>
+              <View style={styles.chipContainer}>
+                {product.tags.map((tag) => (
+                  <Chip
+                    key={tag}
+                    mode="outlined"
+                    icon="tag"
+                    style={styles.chip}
+                    selectedColor={colors.primary}
+                    onPress={() => navigation.navigate('Search', { query: '' })}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
+              </View>
+              <View
+                style={{
+                  marginBottom: getResponsiveHeight(20),
+                  flexDirection: 'row',
+                  gap: getResponsiveWidth(40),
+                }}
               >
+                <View style={{}}>
+                  <Text>Category</Text>
+                  <Text style={[styles.price]}>{product.category}</Text>
+                </View>
+
+                <View>
+                  <Text>Brand</Text>
+                  <Text style={[styles.price]}>{product.brand}</Text>
+                </View>
+              </View>
+              <Divider />
+              <Text style={styles.label}>Size</Text>
+              <View style={styles.optionsContainer}>
+                {product.sizes.map((size) => (
+                  <TouchableOpacity
+                    key={size.size}
+                    onPress={() => setSelectedSize(size.size)}
+                    style={[
+                      styles.optionButton,
+                      {
+                        backgroundColor: colors.elevation.level3,
+                        borderWidth: 1,
+                        borderColor:
+                          selectedSize === size.size
+                            ? colors.primary
+                            : colors.backdrop,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.optionText,
+                        selectedSize === size.size && { color: colors.primary },
+                      ]}
+                    >
+                      {size.size}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Divider style={styles.divider} />
+              <Text style={styles.label}>Color</Text>
+              <View style={styles.optionsContainer}>
+                {product.colors.map((color) => (
+                  <TouchableOpacity
+                    key={color}
+                    style={styles.optionButton}
+                    onPress={() => setSelectedColor(color)}
+                  >
+                    <View
+                      style={[
+                        styles.overlay,
+                        { backgroundColor: color.toLowerCase() },
+                      ]}
+                    />
+                    <View
+                      style={[
+                        styles.colorOption,
+                        { backgroundColor: color.toLowerCase() },
+                      ]}
+                    >
+                      {selectedColor === color && (
+                        <Icon size={15} source="check" color="white" />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Divider style={styles.divider} />
+              <Text style={styles.label}>Description</Text>
+              <Text style={styles.description}>{product.description}</Text>
+            </View>
+          </ScrollView>
+          <View style={styles.footer}>
+            <View>
+              <Text>Price</Text>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Text style={[styles.price, { color: colors.primary }]}>
+                  {product.sellingPrice.toFixed(2)}
+                </Text>
+
                 <Text
                   style={[
-                    styles.optionText,
-                    selectedSize === size && { color: colors.primary },
+                    styles.price,
+                    { textDecorationLine: 'line-through', opacity: 0.5 },
                   ]}
                 >
-                  {size}
+                  {product.costPrice.toFixed(2)}
                 </Text>
-              </TouchableOpacity>
-            ))}
+              </View>
+            </View>
+            <Button
+              mode="contained"
+              labelStyle={{
+                fontSize: getResponsiveFontSize(22),
+                fontWeight: '600',
+              }}
+              onPress={handleAddToCart}
+              contentStyle={{ height: getResponsiveHeight(50) }}
+              icon={'cart'}
+            >
+              Add
+            </Button>
           </View>
-          <Divider style={styles.divider} />
-          <Text style={styles.label}>Color</Text>
-          <View style={styles.optionsContainer}>
-            {product.colorOptions.map((color) => (
-              <TouchableOpacity
-                key={color}
-                style={styles.optionButton}
-                onPress={() => setSelectedColor(color)}
-              >
-                <View
-                  style={[
-                    styles.overlay,
-                    { backgroundColor: color.toLowerCase() },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.colorOption,
-                    { backgroundColor: color.toLowerCase() },
-                  ]}
-                >
-                  {selectedColor === color && (
-                    <Icon size={15} source="check" color="white" />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <Divider style={styles.divider} />
-          <Text style={styles.label}>Description</Text>
-          <Text style={styles.description}>{product.description}</Text>
-        </View>
-      </ScrollView>
-      <View style={styles.footer}>
-        <View>
-          <Text>Price</Text>
-          <Text style={[styles.price, { color: colors.primary }]}>
-            ${product.price.toFixed(2)}
-          </Text>
-        </View>
-        <Button
-          mode="contained"
-          labelStyle={{
-            fontSize: getResponsiveFontSize(22),
-            fontWeight: '600',
-          }}
-          // onPress={handleExchange}
-          contentStyle={{ height: getResponsiveHeight(50) }}
-          icon={'cart'}
-        >
-          Add
-        </Button>
-      </View>
+        </>
+      )}
     </View>
   );
 };
@@ -191,7 +268,7 @@ const styles = StyleSheet.create({
   image: {
     height: getResponsiveHeight(700),
     position: 'absolute',
-    // resizeMode: 'contain',
+    resizeMode: 'contain',
     top: 0,
     left: 0,
     right: 0,

@@ -1,5 +1,5 @@
 import { FlatList, View, StyleSheet, Animated } from 'react-native';
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Appbar,
   Avatar,
@@ -7,6 +7,7 @@ import {
   Card,
   Divider,
   Icon,
+  IconButton,
   Text,
   useTheme,
 } from 'react-native-paper';
@@ -15,13 +16,33 @@ import {
   getResponsiveHeight,
   getResponsiveWidth,
 } from '../utils/size';
-import { data } from '../constant/data';
 import { Wallet as WalletProps } from '../type/wallet';
 import { HomeScreenNavigationProp } from '../type/navigation/stackNav';
+import { useWallet } from '../context/WalletContext';
+import { getCurrencySymbol } from '../utils/currency';
+import { data } from '../constant/data';
+import { baseURL } from '../services/api';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import List from '../component/exchange/List';
+import CustomBackdrop from '../component/CustomBackdrop';
 
 const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
+  const { totalBalance, isVisible, updateIsVisible, wallets, baseCurrency } =
+    useWallet();
   const { colors } = useTheme();
   const scrollY = new Animated.Value(0);
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const openBottomSheet = () => {
+    if (bottomSheetModalRef.current) {
+      bottomSheetModalRef.current.present();
+    }
+  };
+
+  const handleWalletCreate = () => {
+    bottomSheetModalRef.current?.dismiss();
+  };
+
   const renderItem = ({ item }: { item: WalletProps }) => (
     <Card
       style={[styles.card, { backgroundColor: 'transparent' }]}
@@ -30,14 +51,21 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
     >
       <Card.Content style={styles.cardContent}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Avatar.Image size={45} source={{ uri: item.image }} />
+          <Avatar.Image size={45} source={{ uri: baseURL + item.image }} />
           <View style={styles.textContainer}>
             <Text style={styles.currencyFullName}>{item.currency}</Text>
             <Text style={styles.currencyName}>{item.name}</Text>
           </View>
         </View>
         <View style={styles.rateContainer}>
-          {/* <Text style={styles.currencyRate}>{item.rate}</Text> */}
+          <Text style={styles.currencyRate}>
+            {getCurrencySymbol(item.currency)}
+            {item.balance}
+          </Text>
+          <Text style={{ opacity: 0.5 }}>
+            {getCurrencySymbol(baseCurrency.currency)}
+            {item.convertedBalance}
+          </Text>
         </View>
       </Card.Content>
     </Card>
@@ -57,7 +85,7 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
                 {
                   translateY: scrollY.interpolate({
                     inputRange: [0, 150], // Adjust the range as needed
-                    outputRange: [0, -150], // Adjust the translateY value as needed
+                    outputRange: [0, -200], // Adjust the translateY value as needed
                     extrapolate: 'clamp',
                   }),
                 },
@@ -65,9 +93,13 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
             },
           ]}
         >
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             <Text>Total Balance</Text>
-            <Icon source={'eye'} size={20} />
+            <IconButton
+              icon={isVisible ? 'eye-off' : 'eye'}
+              size={20}
+              onPress={() => updateIsVisible(!isVisible)}
+            />
           </View>
           <Text
             style={{
@@ -76,7 +108,20 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               fontWeight: '600',
             }}
           >
-            $487.95
+            {isVisible ? (
+              <Text
+                style={{
+                  color: colors.onPrimary,
+                  fontWeight: '600',
+                  fontSize: getResponsiveFontSize(45),
+                }}
+              >
+                {getCurrencySymbol(baseCurrency.currency)}
+                {totalBalance}
+              </Text>
+            ) : (
+              'xxxx'
+            )}
           </Text>
           <View
             style={{
@@ -112,25 +157,33 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               Withdrawal
             </Button>
           </View>
-
-          <Text
+          <View
             style={{
-              fontSize: getResponsiveFontSize(22),
-              fontWeight: '600',
+              flexDirection: 'row',
+              alignItems: 'center',
               paddingBottom: getResponsiveHeight(20),
+              gap: 10,
             }}
           >
-            Assets
-          </Text>
+            <Text
+              style={{
+                fontSize: getResponsiveFontSize(22),
+                fontWeight: '600',
+              }}
+            >
+              Assets
+            </Text>
+            <IconButton icon={'plus'} size={25} onPress={openBottomSheet} />
+          </View>
           <Divider />
         </Animated.View>
 
         <FlatList
-          data={data}
+          data={wallets}
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          style={{ flex: 1, paddingTop: getResponsiveHeight(200) }}
+          style={{ flex: 1, paddingTop: getResponsiveHeight(250) }}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: false }
@@ -138,6 +191,22 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
           scrollEventThrottle={16}
         />
       </View>
+
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={['90%']}
+        backgroundStyle={{
+          backgroundColor: colors.elevation.level1,
+        }}
+        // style={{ ...tabBarShadowStyle }}
+        handleIndicatorStyle={{
+          backgroundColor: colors.primary,
+        }}
+        backdropComponent={(props) => <CustomBackdrop {...props} />}
+      >
+        <List onSelect={handleWalletCreate} />
+      </BottomSheetModal>
     </View>
   );
 };
@@ -170,7 +239,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   currencyName: {
-    color: 'gray',
+    // color: 'gray',
   },
   currencyFullName: {
     fontWeight: 'bold',
@@ -181,7 +250,7 @@ const styles = StyleSheet.create({
   },
   currencyRate: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: getResponsiveFontSize(20),
   },
   percentageChange: {
     fontSize: 14,

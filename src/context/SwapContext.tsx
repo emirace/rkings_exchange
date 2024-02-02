@@ -6,9 +6,9 @@ import { transferFundsService } from '../services/wallet';
 interface SwapContextType {
   swapAmount: string;
   setSwapAmount(amount: string): void;
-  selectedWalletFrom: Wallet | null;
+  selectedWalletFrom: Wallet;
   setSelectedWalletFrom(from: Wallet): void;
-  selectedWalletTo: Wallet | null;
+  selectedWalletTo: Wallet;
   setSelectedWalletTo(to: Wallet): void;
   clearForm: () => void;
   loading: boolean;
@@ -29,10 +29,28 @@ export const SwapProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const { setAuthErrorModalOpen } = useAuth();
   const [swapAmount, setSwapAmount] = useState<string>('');
-  const [selectedWalletFrom, setSelectedWalletFrom] = useState<Wallet | null>(
-    null
-  );
-  const [selectedWalletTo, setSelectedWalletTo] = useState<Wallet | null>(null);
+  const [selectedWalletFrom, setSelectedWalletFrom] = useState<Wallet>({
+    _id: '',
+    name: 'Naira',
+    type: 'Fiat',
+    currency: 'NGN',
+    balance: 0,
+    convertedBalance: 0,
+    image: '',
+    network: [],
+    address: '',
+  });
+  const [selectedWalletTo, setSelectedWalletTo] = useState<Wallet>({
+    _id: '',
+    name: 'Bitcoin',
+    type: 'Crypto',
+    currency: 'BTC',
+    balance: 0,
+    convertedBalance: 0,
+    image: '',
+    network: [],
+    address: '',
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -74,8 +92,6 @@ export const SwapProvider: React.FC<{ children: ReactNode }> = ({
 
   function clearForm() {
     setSwapAmount('');
-    setSelectedWalletFrom(null);
-    setSelectedWalletTo(null);
   }
 
   return (

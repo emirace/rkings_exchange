@@ -1,4 +1,4 @@
-import { TouchableOpacity, View } from 'react-native';
+import { Animated, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,25 +14,29 @@ import {
   RadioButton,
 } from 'react-native-paper';
 import { Wallet } from '../../type/wallet';
-import List, { data } from '../../component/exchange/List';
+import List from '../../component/exchange/List';
 import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
 import CustomKeyboard from '../../component/CustomKeyboard';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { getCurrencySymbol } from '../../utils/currency';
 import PaymentMethod from '../../component/PaymentMethod';
 import { DepositFiatFormNavigationProp } from '../../type/navigation/stackNav';
+import { useWallet } from '../../context/WalletContext';
 
 const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
   navigation,
   route,
 }) => {
   const _goBack = () => navigation.goBack();
+  const { systemWallets, depositWallet } = useWallet();
+
   const currency = route.params.currency;
   const { colors } = useTheme();
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(true);
   const [text, setText] = React.useState('');
   const [paymentWallet, setPaymentWallet] = useState<Wallet | null>(null);
+  const cursorAnimation = useRef(new Animated.Value(0)).current;
   const [showQuantity, setshowQuantity] = useState(false);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -43,6 +47,32 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
     }
   };
 
+  useEffect(() => {
+    const cursorAnimationLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(cursorAnimation, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(cursorAnimation, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    cursorAnimationLoop.start();
+
+    return () => cursorAnimationLoop.stop();
+  }, [cursorAnimation]);
+
+  const cursorWidth = cursorAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 2],
+  });
+
   const handleInput = (value: string) => {
     setText(value);
   };
@@ -50,7 +80,9 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
   useEffect(() => {
     if (currency) {
       setLoading(true);
-      const currentWallet = data.find((wal) => wal.currency === currency);
+      const currentWallet = systemWallets.find(
+        (wal) => wal.currency === currency
+      );
       setWallet(currentWallet || null);
       setLoading(false);
     }
@@ -63,10 +95,21 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
   };
 
   const handleDeposit = () => {
+    if (!text) return;
     openBottomSheet();
   };
 
-  const onApprove = () => {};
+  const onApprove = async (value: any, method: string) => {
+    const result = await depositWallet(
+      'flutterwave',
+      value.transaction_id,
+      currency
+    );
+    console.log(result);
+    if (result) {
+    } else {
+    }
+  };
 
   return loading ? (
     <ActivityIndicator animating={true} />
@@ -128,6 +171,17 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
               <Text variant="displaySmall">
                 {getCurrencySymbol(wallet.currency)}
                 {text}
+
+                <Animated.View
+                  style={[
+                    {
+                      height: 30,
+                      width: 2,
+                      backgroundColor: colors.onBackground,
+                    },
+                    { opacity: cursorWidth },
+                  ]}
+                />
               </Text>
             </View>
           </View>
@@ -164,6 +218,7 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
           amount={parseFloat(text)}
           currency={currency}
           onApprove={onApprove}
+          methods={['card']}
         />
       </BottomSheetModal>
     </View>

@@ -12,9 +12,11 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import CustomBackdrop from '../../component/CustomBackdrop';
 import DeliveryInfo from '../../component/DeliveryInfo';
 import { useOrder } from '../../context/OrderContext';
+import useCart from '../../context/CartContext';
 
 const Checkout: React.FC<CheckoutNavigationProp> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { total } = useCart();
   const { shippingInfo } = useOrder();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isShipping, setIsShipping] = useState(false);
@@ -166,7 +168,9 @@ const Checkout: React.FC<CheckoutNavigationProp> = ({ navigation }) => {
             />
           )}
         </View>
-        <PaymentMethod amount={200} currency="USD" onApprove={onApprove} />
+        {isShipping && (
+          <PaymentMethod amount={total} currency="NGN" onApprove={onApprove} />
+        )}
       </View>
 
       <BottomSheetModal

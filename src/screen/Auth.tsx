@@ -118,7 +118,7 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
   }) => {
     return (
       <ImageBackground
-        source={{ uri: item.backgroundImage }}
+        source={require('../../assets/images/app.jpg')}
         style={styles.backgroundImage}
       >
         <LinearGradient
@@ -127,10 +127,16 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
         />
 
         <Image
-          source={{ uri: 'https://rkingsexchange.com/images/logo_white.PNG' }}
+          source={require('../../assets/images/logo_white.png')}
           style={styles.logo}
           alt="logo"
         />
+        <Text
+          style={styles.skip}
+          onPress={() => navigation.navigate('HomeMain')}
+        >
+          Skip
+        </Text>
         <View style={styles.contentContainer}>
           <View style={styles.textContainer}>
             <Text style={styles.header}>{item.header}</Text>
@@ -344,6 +350,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: getResponsiveHeight(70),
     alignSelf: 'center',
+  },
+  skip: {
+    fontWeight: '600',
+    color: 'white',
+    position: 'absolute',
+    top: getResponsiveHeight(50),
+    right: getResponsiveWidth(30),
+    zIndex: 50,
   },
 });
 

@@ -29,7 +29,7 @@ import PaymentMethod from '../../component/PaymentMethod';
 import CustomBackdrop from '../../component/CustomBackdrop';
 
 const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
-  const { systemWallets, baseCurrency, depositWallet } = useWallet();
+  const { systemWallets, baseCurrency, depositWallet, error } = useWallet();
   const _goBack = () => navigation.goBack();
   const currency = route.params.currency;
   const { colors } = useTheme();
@@ -131,11 +131,20 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
 
   const onApprove = async (value: any, method: string) => {
     console.log(value);
-    const result = await depositWallet(method, value.transaction._id, currency);
-    if (result) {
+    if (value.status === 'Completed') {
+      const result = await depositWallet(
+        method,
+        value.transaction_id,
+        currency
+      );
       bottomSheetModalRef2.current?.dismiss();
-      navigation.navigate('HomeMain');
+      if (result) {
+        navigation.navigate('HomeMain');
+      } else {
+        setVisible(true);
+      }
     } else {
+      setVisible(true);
     }
   };
 
@@ -211,7 +220,9 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
           >
             <View>
               <Text variant="displaySmall">
-                {getCurrencySymbol(paymentWallet?.currency || '')}
+                {getCurrencySymbol(
+                  showQuantity ? currency : paymentWallet.currency
+                )}
                 {text}
                 <Animated.View
                   style={[
@@ -281,12 +292,44 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
       </View>
 
       <Modal
-        visible={true}
+        visible={visible}
         onDismiss={hideModal}
-        contentContainerStyle={[{ backgroundColor: colors.background }]}
+        contentContainerStyle={[
+          {
+            backgroundColor: colors.background,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+            margin: 20,
+            borderRadius: 10,
+          },
+        ]}
       >
-        <Icon source={'message-alert'} size={50} color={colors.onBackground} />
-        <Text>Example Modal. Click outside this area to dismiss.</Text>
+        <Icon source={'message-alert'} size={50} color={colors.primary} />
+        <Text
+          style={{
+            fontWeight: '600',
+            fontSize: getResponsiveFontSize(30),
+            marginBottom: getResponsiveHeight(20),
+          }}
+        >
+          Transaction failed
+        </Text>
+        <Text>{error}</Text>
+        <Button
+          mode="contained"
+          labelStyle={{
+            fontSize: getResponsiveFontSize(22),
+            fontWeight: '600',
+          }}
+          style={{
+            marginTop: getResponsiveHeight(20),
+          }}
+          onPress={() => setVisible(false)}
+          contentStyle={{ height: getResponsiveHeight(60) }}
+        >
+          Try again
+        </Button>
       </Modal>
 
       <BottomSheetModal

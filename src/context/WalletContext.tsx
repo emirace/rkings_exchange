@@ -45,6 +45,8 @@ interface WalletContextData {
   ) => Promise<boolean>;
   deleteSystemWallet: (walletId: string) => Promise<boolean>;
   createSystemWallet: (walletData: SystemWalletData) => Promise<boolean>;
+  isVisible: boolean;
+  updateIsVisible: (value: boolean) => void;
 }
 
 export const WalletContext = createContext<WalletContextData | undefined>(
@@ -63,6 +65,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
     const storedBaseCurrency = await SecureStore.getItemAsync('baseCurrency');
     return storedBaseCurrency ? JSON.parse(storedBaseCurrency) : null;
   };
+  const [isVisible, setIsVisible] = useState<boolean>(true);
 
   const [baseCurrency, setBaseCurrency] = useState<Wallet>({
     _id: '',
@@ -87,6 +90,15 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
       setAuthErrorModalOpen(true);
     } else {
       setError(error || 'An error occurred.');
+    }
+  };
+
+  const updateIsVisible = async (value: boolean) => {
+    setIsVisible(value);
+    if (value) {
+      await SecureStore.setItemAsync('isVisible', JSON.stringify(value));
+    } else {
+      await SecureStore.deleteItemAsync('isVisible');
     }
   };
 
@@ -282,6 +294,10 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
       if (result) {
         setBaseCurrency(result);
       }
+      const isVisibleResult = await SecureStore.getItemAsync('isVisible');
+      if (isVisibleResult) {
+        setIsVisible(true);
+      }
     };
     getbase();
   }, []);
@@ -291,10 +307,12 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         wallets,
         loading,
+        isVisible,
         error,
         baseCurrency,
         totalBalance,
         systemWallets,
+        updateIsVisible,
         createSystemWallet,
         updateSystemWallet,
         deleteSystemWallet,

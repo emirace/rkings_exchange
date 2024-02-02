@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View, Animated, StyleSheet, Text } from 'react-native';
+import { FlatList, View, Animated, StyleSheet } from 'react-native';
 import CardListItem from './CardListItem';
 import { Wallet } from '../../type/wallet';
 import { FiatListNavigationProp } from '../../type/navigation/topNav';
 import { Searchbar } from 'react-native-paper';
 import { data } from '../../constant/data';
+import { useWallet } from '../../context/WalletContext';
+import { Text } from 'react-native-paper';
 
 const FiatListy: React.FC<FiatListNavigationProp> = ({ navigation, route }) => {
+  const { systemWallets } = useWallet();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState<Wallet[]>([]);
   const scrollY = new Animated.Value(0);
@@ -23,10 +26,11 @@ const FiatListy: React.FC<FiatListNavigationProp> = ({ navigation, route }) => {
   // Update filteredData when searchQuery changes
   useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase();
-    const filtered = data.filter(
+    const filtered = systemWallets.filter(
       (item) =>
-        item.name.toLowerCase().includes(lowerCaseQuery) ||
-        item.currency.toLowerCase().includes(lowerCaseQuery)
+        item.type === 'Fiat' &&
+        (item.name.toLowerCase().includes(lowerCaseQuery) ||
+          item.currency.toLowerCase().includes(lowerCaseQuery))
     );
     setFilteredData(filtered);
   }, [searchQuery]);

@@ -21,6 +21,10 @@ import { DepositProvider } from './context/DepositContext';
 import { PageProvider } from './context/PageContext';
 import { OrderProvider } from './context/OrderContext';
 import { WalletProvider } from './context/WalletContext';
+import { WithdrawProvider } from './context/WithdrawContext';
+import { ProductProvider } from './context/ProductContext';
+import { ToastNotificationProvider } from './context/ToastNotificationContext';
+import { CartProvider } from './context/CartContext';
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -41,21 +45,29 @@ const Main = () => {
       <NavigationContainer
         theme={themeMode === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme}
       >
-        <AuthProvider>
-          <SwapProvider>
-            <DepositProvider>
-              <PageProvider>
-                <OrderProvider>
-                  <WalletProvider>
-                    <BottomSheetModalProvider>
-                      <MainStackNav />
-                    </BottomSheetModalProvider>
-                  </WalletProvider>
-                </OrderProvider>
-              </PageProvider>
-            </DepositProvider>
-          </SwapProvider>
-        </AuthProvider>
+        <ToastNotificationProvider>
+          <AuthProvider>
+            <SwapProvider>
+              <DepositProvider>
+                <PageProvider>
+                  <OrderProvider>
+                    <WalletProvider>
+                      <WithdrawProvider>
+                        <ProductProvider>
+                          <CartProvider>
+                            <BottomSheetModalProvider>
+                              <MainStackNav />
+                            </BottomSheetModalProvider>
+                          </CartProvider>
+                        </ProductProvider>
+                      </WithdrawProvider>
+                    </WalletProvider>
+                  </OrderProvider>
+                </PageProvider>
+              </DepositProvider>
+            </SwapProvider>
+          </AuthProvider>
+        </ToastNotificationProvider>
       </NavigationContainer>
     </PaperProvider>
   );

@@ -15,42 +15,52 @@ import {
   getResponsiveWidth,
 } from '../../utils/size';
 import { CartNavigationProp } from '../../type/navigation/stackNav';
-
-const sampleCartItems = [
-  {
-    _id: 1,
-    name: 'Sample Product 1',
-    image: 'https://placekitten.com/200/300', // Replace with your actual image URL
-    category: 'Category A',
-    sellingPrice: 29.99,
-    selectedSize: 'M',
-    quantity: 2,
-  },
-  {
-    _id: 2,
-    name: 'Sample Product 2',
-    image: 'https://placekitten.com/201/300', // Replace with your actual image URL
-    category: 'Category B',
-    sellingPrice: 39.99,
-    selectedSize: 'L',
-    quantity: 1,
-  },
-  // Add more sample items as needed
-];
+import useCart, { CartItem } from '../../context/CartContext';
+import useToastNotification from '../../context/ToastNotificationContext';
+import { useProduct } from '../../context/ProductContext';
+import { baseURL } from '../../services/api';
 
 const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
+  const { cart, removeFromCart, addToCart, subtotal, total, clearCart } =
+    useCart();
+  const { fetchProductById } = useProduct();
+  const { addNotification } = useToastNotification();
   const { colors } = useTheme();
 
   const handleCheckout = () => {
+    if (cart.length < 1) {
+      return;
+    }
     navigation.navigate('Checkout');
   };
-  const renderItem = ({ item }) => (
+
+  const handleAddToCart = async (product: CartItem, type: string) => {
+    if (type === 'minus') {
+      addToCart({ ...product, quantity: product.quantity - 1 });
+      return;
+    }
+    const currentProduct = await fetchProductById(product._id);
+    if (currentProduct) {
+      if (currentProduct.countInStock > product.quantity + 1) {
+        addNotification('Out of stock.');
+      } else {
+        addToCart({ ...product, quantity: product.quantity + 1 });
+      }
+    }
+  };
+
+  const renderItem = ({ item }: { item: CartItem }) => (
     <Card style={styles.card} mode="contained">
       <Card.Content style={styles.cardContent}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Card.Cover source={{ uri: item.image }} style={styles.cardImage} />
+          <Card.Cover
+            source={{ uri: baseURL + item.images[0] }}
+            style={styles.cardImage}
+          />
           <View>
-            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={styles.productName} numberOfLines={1}>
+              {item.name}
+            </Text>
             <Text style={{ fontWeight: 'bold' }}> {item.category}</Text>
             <View
               style={{
@@ -60,7 +70,7 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
                 marginTop: getResponsiveHeight(10),
               }}
             >
-              <Text>${item.sellingPrice.toFixed(2)}</Text>
+              <Text>{item.sellingPrice.toFixed(2)}</Text>
               <Text>Size: {item.selectedSize}</Text>
             </View>
           </View>
@@ -71,7 +81,7 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
             style={{ margin: 0 }}
             iconColor="white"
             size={15}
-            //   onPress={() => increaseQuantity(item.id)}
+            onPress={() => handleAddToCart(item, 'plus')}
           />
           <Text style={{ color: 'white' }}>{item.quantity}</Text>
           <IconButton
@@ -79,7 +89,11 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
             style={{ margin: 0 }}
             iconColor="white"
             size={15}
-            //   onPress={() => decreaseQuantity(item.id)}
+            onPress={() =>
+              item.quantity > 1
+                ? handleAddToCart(item, 'minus')
+                : removeFromCart(item._id)
+            }
           />
         </View>
         {/* <Button
@@ -101,9 +115,14 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
           }}
         />
         <Appbar.Content title="Cart" />
+        <Appbar.Action
+          icon="delete-empty-outline"
+          size={25}
+          onPress={clearCart}
+        />
       </Appbar.Header>
       <FlatList
-        data={sampleCartItems}
+        data={cart}
         keyExtractor={(item) => item._id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.container}
@@ -124,7 +143,7 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
               opacity: 0.5,
             }}
           >
-            Subtotal(2 items)
+            Subtotal({cart.length} items)
           </Text>
           <Text
             variant="titleLarge"
@@ -134,7 +153,7 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
               opacity: 0.5,
             }}
           >
-            $657
+            {subtotal}
           </Text>
         </View>
         <View
@@ -162,7 +181,7 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
               opacity: 0.5,
             }}
           >
-            $10
+            0
           </Text>
         </View>
         <Divider style={{ marginVertical: 20 }} />
@@ -184,7 +203,7 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
             variant="titleLarge"
             style={{ fontWeight: '600', fontSize: getResponsiveFontSize(22) }}
           >
-            $4345
+            {total}
           </Text>
         </View>
         <Button
@@ -224,6 +243,7 @@ const styles = StyleSheet.create({
     fontSize: getResponsiveFontSize(20),
     fontWeight: 'bold',
     marginBottom: 8,
+    width: getResponsiveWidth(150),
   },
   cardActions: {
     alignItems: 'center',

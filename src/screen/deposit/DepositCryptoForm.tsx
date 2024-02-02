@@ -14,11 +14,13 @@ import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
 import { DepositCryptoFormNavigationProp } from '../../type/navigation/stackNav';
 import { data } from '../../constant/data';
 import { useDeposit } from '../../context/DepositContext';
+import { useWallet } from '../../context/WalletContext';
 
 const DepositCryptoForm: React.FC<DepositCryptoFormNavigationProp> = ({
   navigation,
   route,
 }) => {
+  const { systemWallets } = useWallet();
   const _goBack = () => navigation.goBack();
   const { wallet, updateWallet, network, updateNetwork } = useDeposit();
   const currency = route.params.currency;
@@ -27,7 +29,9 @@ const DepositCryptoForm: React.FC<DepositCryptoFormNavigationProp> = ({
   useEffect(() => {
     if (currency) {
       setLoading(true);
-      const currentWallet = data.find((wal) => wal.currency === currency);
+      const currentWallet = systemWallets.find(
+        (wal) => wal.currency === currency
+      );
       if (currentWallet) {
         updateWallet(currentWallet);
       }
@@ -109,7 +113,7 @@ const DepositCryptoForm: React.FC<DepositCryptoFormNavigationProp> = ({
         </View>
 
         <FlatList
-          data={wallet.network}
+          data={['bitcoin']}
           keyExtractor={(item) => item}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}

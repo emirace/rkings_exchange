@@ -12,13 +12,13 @@ import {
   getResponsiveFontSize,
   getResponsiveHeight,
   getResponsiveWidth,
-} from '../utils/size';
-import { Wallet } from '../type/wallet';
+} from '../../utils/size';
+import { Wallet } from '../../type/wallet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import List from './exchange/List';
-import { getCurrencySymbol } from '../utils/currency';
+import { getCurrencySymbol } from '../../utils/currency';
 import PayWithFlutterwave from 'flutterwave-react-native';
-import { generateTransactionRef } from '../utils/helper';
+import { generateTransactionRef } from '../../utils/helper';
+import List from './List';
 
 interface Props {
   amount: number;

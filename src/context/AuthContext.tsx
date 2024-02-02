@@ -224,7 +224,7 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   };
 
   const logout = async () => {
-    logoutUser();
+    // logoutUser();
     setUser(null);
     await SecureStore.deleteItemAsync('authToken');
   };

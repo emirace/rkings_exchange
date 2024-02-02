@@ -14,6 +14,7 @@ import TodayRate from '../component/home/TodayRate';
 import { getResponsiveHeight, getResponsiveWidth } from '../utils/size';
 import { HomeScreenNavigationProp } from '../type/navigation/stackNav';
 import useAuth from '../context/AuthContext';
+import { baseURL } from '../services/api';
 
 const Home: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
   const { user } = useAuth();
@@ -34,7 +35,7 @@ const Home: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
             <Avatar.Image
               size={getResponsiveHeight(50)}
               source={{
-                uri: user.image,
+                uri: baseURL + user.image,
               }}
             />
           </Button>

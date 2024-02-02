@@ -1,13 +1,18 @@
 import { View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Icon, IconButton, Text, useTheme } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
 import useAuth from '../../context/AuthContext';
+import { useWallet } from '../../context/WalletContext';
+import { getCurrencySymbol } from '../../utils/currency';
 
 const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
   const { user } = useAuth();
+  const { totalBalance, baseCurrency } = useWallet();
+  const [show, setShow] = useState(true);
+
   const handleCardPress = (value: 'Buy' | 'Sell') => {
     navigation.navigate(value);
   };
@@ -36,7 +41,7 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
         }}
       >
         <View>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             <Text
               //   variant="titleLarge"
               style={{
@@ -46,7 +51,12 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
             >
               Current Balance
             </Text>
-            <Icon source={'eye'} size={20} color="white" />
+            <IconButton
+              icon={show ? 'eye-off' : 'eye'}
+              size={20}
+              iconColor="white"
+              onPress={() => setShow(!show)}
+            />
           </View>
           <Text
             //   variant="displayMedium"
@@ -56,7 +66,20 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
               fontSize: getResponsiveFontSize(45),
             }}
           >
-            $21983890.00
+            {show ? (
+              <Text
+                style={{
+                  color: colors.onPrimary,
+                  fontWeight: '600',
+                  fontSize: getResponsiveFontSize(45),
+                }}
+              >
+                {getCurrencySymbol(baseCurrency.currency)}
+                {totalBalance}
+              </Text>
+            ) : (
+              'xxxx'
+            )}
           </Text>
         </View>
         <IconButton

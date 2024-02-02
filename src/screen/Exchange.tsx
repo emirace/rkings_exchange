@@ -1,12 +1,20 @@
-import { View, TouchableOpacity } from 'react-native';
-import React, { useRef, useState } from 'react';
+import { View, TouchableOpacity, Animated } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import CustomKeyboard from '../component/CustomKeyboard';
 import {
   getResponsiveFontSize,
   getResponsiveHeight,
   getResponsiveWidth,
 } from '../utils/size';
-import { Appbar, useTheme, Text, Icon, Button } from 'react-native-paper';
+import {
+  Appbar,
+  useTheme,
+  Text,
+  Icon,
+  Button,
+  ActivityIndicator,
+  Modal,
+} from 'react-native-paper';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import List from '../component/exchange/List';
 import Confirm from '../component/exchange/Confirm';
@@ -14,6 +22,8 @@ import { useSwap } from '../context/SwapContext';
 import { Wallet } from '../type/wallet';
 import CustomBackdrop from '../component/CustomBackdrop';
 import { ExchangeNavigationProp } from '../type/navigation/stackNav';
+import { getConversionRate, getCurrencySymbol } from '../utils/currency';
+import { useWallet } from '../context/WalletContext';
 
 const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
   const {
@@ -23,12 +33,73 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
     setSwapAmount,
     setSelectedWalletFrom,
     setSelectedWalletTo,
+    error,
   } = useSwap();
   const { colors } = useTheme();
   const [editing, setEditing] = useState('from');
-
+  const { wallets } = useWallet();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef2 = useRef<BottomSheetModal>(null);
+  const cursorAnimation = useRef(new Animated.Value(0)).current;
+  const [exchange, setExchange] = useState(0);
+  const [exchangeLoading, setExchangeLoading] = useState(true);
+  const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const cursorAnimationLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(cursorAnimation, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(cursorAnimation, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    cursorAnimationLoop.start();
+
+    return () => cursorAnimationLoop.stop();
+  }, [cursorAnimation]);
+
+  const cursorWidth = cursorAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 2],
+  });
+
+  useEffect(() => {
+    const getExchange = async () => {
+      try {
+        if (!selectedWalletFrom || !selectedWalletTo) return;
+        setExchangeLoading(true);
+        const rate = await getConversionRate(
+          selectedWalletFrom.currency,
+          selectedWalletTo.currency
+        );
+        setExchange(rate);
+        setExchangeLoading(false);
+      } catch (error) {
+        setExchangeLoading(false);
+        // addNotification(getBackendErrorMessage(error));
+        setExchange(0);
+      }
+    };
+    getExchange();
+  }, [selectedWalletFrom, selectedWalletTo]);
+
+  useEffect(() => {
+    const currentWallet = wallets.find(
+      (wal) => wal.currency === selectedWalletFrom.currency
+    );
+    if (currentWallet) {
+      setWallet(currentWallet);
+    }
+  }, [selectedWalletFrom]);
 
   const openBottomSheet = (value: string) => {
     if (bottomSheetModalRef.current) {
@@ -42,6 +113,8 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
       bottomSheetModalRef2.current.present();
     }
   };
+
+  const hideModal = () => setVisible(false);
 
   const handleInput = (value: string) => {
     setSwapAmount(value);
@@ -61,6 +134,12 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
   const handleExchange = () => {
     openBottomSheet2();
   };
+
+  const handleFailed = (value: boolean) => {
+    setVisible(value);
+    bottomSheetModalRef2.current?.dismiss();
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Appbar.Header>
@@ -111,7 +190,18 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
               <View>
                 <Text variant="titleMedium">You have</Text>
                 <Text variant="displaySmall" style={{ marginBottom: 10 }}>
-                  ${swapAmount}
+                  {getCurrencySymbol(selectedWalletFrom.currency)}
+                  {swapAmount}
+                  <Animated.View
+                    style={[
+                      {
+                        height: 30,
+                        width: 2,
+                        backgroundColor: colors.onBackground,
+                      },
+                      { opacity: cursorWidth },
+                    ]}
+                  />
                 </Text>
                 <Text
                   variant="titleMedium"
@@ -120,7 +210,8 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
                     fontSize: getResponsiveFontSize(20),
                   }}
                 >
-                  $22344.87 available
+                  {getCurrencySymbol(selectedWalletFrom?.currency)}
+                  {wallet?.balance || 0} available
                 </Text>
               </View>
               <TouchableOpacity
@@ -149,7 +240,8 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
               <View>
                 <Text variant="titleMedium">You get</Text>
                 <Text variant="displaySmall" style={{ marginBottom: 10 }}>
-                  $12,750.00
+                  {getCurrencySymbol(selectedWalletTo.currency)}
+                  {swapAmount ? exchange * parseFloat(swapAmount) : ''}
                 </Text>
                 <Text
                   variant="titleMedium"
@@ -158,7 +250,13 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
                     fontSize: getResponsiveFontSize(20),
                   }}
                 >
-                  Rate $67/#
+                  Rate {getCurrencySymbol(selectedWalletTo.currency)}
+                  {exchangeLoading ? (
+                    <ActivityIndicator size={10} />
+                  ) : (
+                    exchange
+                  )}{' '}
+                  to {getCurrencySymbol(selectedWalletFrom.currency)}
                 </Text>
               </View>
 
@@ -191,6 +289,48 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
         </View>
       </View>
 
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={[
+          {
+            backgroundColor: colors.background,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+            margin: 20,
+            borderRadius: 10,
+            zIndex: 50,
+          },
+        ]}
+      >
+        <Icon source={'message-alert'} size={50} color={colors.primary} />
+        <Text
+          style={{
+            fontWeight: '600',
+            fontSize: getResponsiveFontSize(30),
+            marginBottom: getResponsiveHeight(20),
+          }}
+        >
+          Transaction failed
+        </Text>
+        <Text>{error}</Text>
+        <Button
+          mode="contained"
+          labelStyle={{
+            fontSize: getResponsiveFontSize(22),
+            fontWeight: '600',
+          }}
+          style={{
+            marginTop: getResponsiveHeight(20),
+          }}
+          onPress={() => setVisible(false)}
+          contentStyle={{ height: getResponsiveHeight(60) }}
+        >
+          Try again
+        </Button>
+      </Modal>
+
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -220,7 +360,7 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
         }}
         backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
-        <Confirm />
+        <Confirm setVisible={setVisible} navigation={navigation} />
       </BottomSheetModal>
     </View>
   );

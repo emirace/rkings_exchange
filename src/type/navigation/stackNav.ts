@@ -17,6 +17,7 @@ export type RootStackParamList = {
   Checkout: undefined;
   CryptoDetail: { crypto: string };
   Appearance: undefined;
+  Currency: undefined;
   Auth: undefined;
   // Add other screen names and their params as needed
 };
@@ -99,6 +100,11 @@ export type CryptoDetailNavigationProp = NativeStackScreenProps<
 export type AppearanceNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   'Appearance'
+>;
+
+export type CurrencyNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'Currency'
 >;
 
 export type AuthNavigationProp = NativeStackScreenProps<

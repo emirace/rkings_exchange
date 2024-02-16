@@ -3,12 +3,6 @@ import React from 'react';
 import { Avatar, Card, Text } from 'react-native-paper';
 import { getResponsiveHeight } from '../../utils/size';
 import { Wallet } from '../../type/wallet';
-import { DepositNavigationProp } from '../../type/navigation/stackNav';
-import {
-  CryptoListNavigationProp,
-  FiatListNavigationProp,
-  RootTopParamList,
-} from '../../type/navigation/topNav';
 import { baseURL } from '../../services/api';
 
 interface Props {

@@ -21,6 +21,8 @@ import { SellFormNavigationProp } from '../../type/navigation/stackNav';
 import { useWallet } from '../../context/WalletContext';
 import { getConversionRate, getCurrencySymbol } from '../../utils/currency';
 import { useWithdraw } from '../../context/WithdrawContext';
+import { baseURL } from '../../services/api';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
 
 const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
   const { systemWallets, baseCurrency, fetchWallets } = useWallet();
@@ -169,7 +171,7 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
             }}
           >
             <Avatar.Image
-              source={{ uri: wallet.image }}
+              source={{ uri: baseURL + wallet.image }}
               size={getResponsiveHeight(20)}
             />
             <Text
@@ -243,7 +245,12 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
             {getCurrencySymbol(
               showQuantity ? paymentWallet.currency : currency
             )}
-            {exchangeLoading ? <ActivityIndicator size={10} /> : exchange} to{' '}
+            {exchangeLoading ? (
+              <ActivityIndicator size={10} />
+            ) : (
+              formatNumberWithCommasAndDecimals(exchange, 9)
+            )}{' '}
+            to{' '}
             {getCurrencySymbol(
               showQuantity ? currency : paymentWallet.currency
             )}
@@ -256,11 +263,12 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
           <Button
             mode="contained"
             labelStyle={{
-              fontSize: getResponsiveFontSize(22),
-              fontWeight: '600',
+              fontWeight: '800',
             }}
+            uppercase
+            style={{ borderRadius: 5 }}
             onPress={onApprove}
-            contentStyle={{ height: getResponsiveHeight(60) }}
+            contentStyle={{ height: getResponsiveHeight(50) }}
             loading={loadingWithdraw}
           >
             Sell
@@ -296,12 +304,10 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
         <Button
           mode="contained"
           labelStyle={{
-            fontSize: getResponsiveFontSize(22),
-            fontWeight: '600',
+            fontWeight: '800',
           }}
-          style={{
-            marginTop: getResponsiveHeight(20),
-          }}
+          uppercase
+          style={{ borderRadius: 5, marginTop: getResponsiveHeight(20) }}
           onPress={() => setVisible(false)}
           contentStyle={{ height: getResponsiveHeight(60) }}
         >
@@ -320,7 +326,7 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
           backgroundColor: colors.primary,
         }}
       >
-        <List onSelect={handleWalletChange} />
+        <List onSelect={handleWalletChange} type="Fiat" />
       </BottomSheetModal>
     </View>
   );

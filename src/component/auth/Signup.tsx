@@ -82,7 +82,9 @@ const SignUp: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
         mode="contained"
         onPress={handleSignIn}
         style={styles.signInButton}
-        labelStyle={{ fontSize: getResponsiveFontSize(22) }}
+        uppercase
+        contentStyle={{ height: getResponsiveHeight(50) }}
+        labelStyle={{ fontWeight: '800' }}
         loading={loading}
         disabled={loading}
       >
@@ -155,9 +157,7 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     marginTop: 16,
-    height: getResponsiveHeight(50),
-    justifyContent: 'center',
-    borderRadius: 10,
+    borderRadius: 5,
   },
   errorText: {
     color: 'red',

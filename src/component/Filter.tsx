@@ -226,10 +226,10 @@ const Filter: React.FC<FilterComponentProps> = ({
         onPress={onClose}
         style={styles.applyButton}
         labelStyle={{
-          fontSize: getResponsiveFontSize(22),
-          fontWeight: '600',
+          fontWeight: '800',
         }}
-        contentStyle={{ height: getResponsiveHeight(60) }}
+        uppercase
+        contentStyle={{ height: getResponsiveHeight(50) }}
       >
         Apply Filters
       </Button>

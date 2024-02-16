@@ -25,6 +25,8 @@ import { baseURL } from '../services/api';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import List from '../component/exchange/List';
 import CustomBackdrop from '../component/CustomBackdrop';
+import LoginModal from '../component/auth/LoginModal';
+import { formatNumberWithCommasAndDecimals } from '../utils/helper';
 
 const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
   const { totalBalance, isVisible, updateIsVisible, wallets, baseCurrency } =
@@ -60,11 +62,11 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
         <View style={styles.rateContainer}>
           <Text style={styles.currencyRate}>
             {getCurrencySymbol(item.currency)}
-            {item.balance}
+            {formatNumberWithCommasAndDecimals(item.balance)}
           </Text>
           <Text style={{ opacity: 0.5 }}>
             {getCurrencySymbol(baseCurrency.currency)}
-            {item.convertedBalance}
+            {formatNumberWithCommasAndDecimals(item.convertedBalance)}
           </Text>
         </View>
       </Card.Content>
@@ -106,21 +108,21 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               fontSize: getResponsiveFontSize(36),
               marginVertical: getResponsiveHeight(10),
               fontWeight: '600',
+              height: getResponsiveHeight(38),
             }}
           >
             {isVisible ? (
               <Text
                 style={{
-                  color: colors.onPrimary,
                   fontWeight: '600',
                   fontSize: getResponsiveFontSize(45),
                 }}
               >
                 {getCurrencySymbol(baseCurrency.currency)}
-                {totalBalance}
+                {formatNumberWithCommasAndDecimals(totalBalance)}
               </Text>
             ) : (
-              'xxxx'
+              '*******'
             )}
           </Text>
           <View
@@ -128,16 +130,18 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               flexDirection: 'row',
               justifyContent: 'space-around',
               marginTop: getResponsiveHeight(10),
-              marginBottom: getResponsiveHeight(30),
+              marginBottom: getResponsiveHeight(20),
+              gap: 10,
             }}
           >
             <Button
               mode="contained"
               icon={'arrow-down-bold-circle'}
               labelStyle={{
-                fontSize: getResponsiveFontSize(22),
-                fontWeight: '600',
+                fontWeight: '800',
               }}
+              uppercase
+              style={{ borderRadius: 5, flex: 1 }}
               onPress={() => navigation.navigate('Deposit')}
               contentStyle={{ height: getResponsiveHeight(50) }}
             >
@@ -148,9 +152,10 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               mode="outlined"
               icon={'arrow-up-bold-circle'}
               labelStyle={{
-                fontSize: getResponsiveFontSize(22),
-                fontWeight: '600',
+                fontWeight: '800',
               }}
+              uppercase
+              style={{ borderRadius: 5, flex: 1 }}
               // onPress={handleExchange}
               contentStyle={{ height: getResponsiveHeight(50) }}
             >
@@ -161,7 +166,6 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              paddingBottom: getResponsiveHeight(20),
               gap: 10,
             }}
           >
@@ -191,7 +195,7 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
           scrollEventThrottle={16}
         />
       </View>
-
+      <LoginModal navigation={navigation} />
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -212,10 +216,6 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: getResponsiveHeight(30),
-    flex: 1,
-  },
   header: {
     position: 'absolute',
     top: 0,

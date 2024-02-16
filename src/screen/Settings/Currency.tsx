@@ -15,9 +15,15 @@ import {
 } from '../../type/navigation/stackNav';
 import useTheme from '../../context/ThemeContext';
 import { useWallet } from '../../context/WalletContext';
+import { Wallet } from '../../type/wallet';
 
 const Currency: React.FC<CurrencyNavigationProp> = ({ navigation }) => {
   const { systemWallets, baseCurrency, setBaseCurrency } = useWallet();
+
+  const handleClick = (value: Wallet) => {
+    setBaseCurrency(value);
+    navigation.goBack();
+  };
 
   return (
     <View>
@@ -38,7 +44,7 @@ const Currency: React.FC<CurrencyNavigationProp> = ({ navigation }) => {
                   ? 'checked'
                   : 'unchecked'
               }
-              onPress={() => setBaseCurrency(option)}
+              onPress={() => handleClick(option)}
             />
           ))}
       </View>

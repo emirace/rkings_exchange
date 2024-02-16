@@ -27,9 +27,13 @@ import { baseURL } from '../../services/api';
 import { getConversionRate, getCurrencySymbol } from '../../utils/currency';
 import PaymentMethod from '../../component/PaymentMethod';
 import CustomBackdrop from '../../component/CustomBackdrop';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
+import LoginModal from '../../component/auth/LoginModal';
+import useAuth from '../../context/AuthContext';
 
 const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
   const { systemWallets, baseCurrency, depositWallet, error } = useWallet();
+  const { user, setAuthErrorModalOpen } = useAuth();
   const _goBack = () => navigation.goBack();
   const currency = route.params.currency;
   const { colors } = useTheme();
@@ -131,13 +135,13 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
 
   const onApprove = async (value: any, method: string) => {
     console.log(value);
-    if (value.status === 'Completed') {
+    bottomSheetModalRef2.current?.dismiss();
+    if (value.status === 'Completed' || value.status === 'successful') {
       const result = await depositWallet(
         method,
         value.transaction_id,
         currency
       );
-      bottomSheetModalRef2.current?.dismiss();
       if (result) {
         navigation.navigate('HomeMain');
       } else {
@@ -146,6 +150,11 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
     } else {
       setVisible(true);
     }
+  };
+
+  const handleBuy = () => {
+    if (!text) return;
+    openBottomSheet2();
   };
 
   return loading ? (
@@ -256,7 +265,10 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
                 {exchangeLoading ? (
                   <ActivityIndicator size={10} />
                 ) : (
-                  parseFloat(text) * exchange
+                  formatNumberWithCommasAndDecimals(
+                    parseFloat(text) * exchange,
+                    9
+                  )
                 )}
               </Text>
               <Text variant="labelLarge">
@@ -264,7 +276,11 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
                 {getCurrencySymbol(
                   showQuantity ? paymentWallet.currency : currency
                 )}
-                {exchangeLoading ? <ActivityIndicator size={10} /> : exchange}{' '}
+                {exchangeLoading ? (
+                  <ActivityIndicator size={10} />
+                ) : (
+                  formatNumberWithCommasAndDecimals(exchange, 9)
+                )}{' '}
                 to{' '}
                 {getCurrencySymbol(
                   showQuantity ? currency : paymentWallet.currency
@@ -275,21 +291,23 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
           )}
         </View>
 
-        <View>
+        <View style={{ marginBottom: getResponsiveHeight(20) }}>
           <CustomKeyboard onKeyPress={handleInput} />
           <Button
             mode="contained"
             labelStyle={{
-              fontSize: getResponsiveFontSize(22),
-              fontWeight: '600',
+              fontWeight: '800',
             }}
-            onPress={text ? openBottomSheet2 : undefined}
-            contentStyle={{ height: getResponsiveHeight(60) }}
+            uppercase
+            style={{ borderRadius: 5 }}
+            onPress={handleBuy}
+            contentStyle={{ height: getResponsiveHeight(50) }}
           >
             Buy
           </Button>
         </View>
       </View>
+      <LoginModal navigation={navigation} />
 
       <Modal
         visible={visible}
@@ -319,14 +337,12 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
         <Button
           mode="contained"
           labelStyle={{
-            fontSize: getResponsiveFontSize(22),
-            fontWeight: '600',
+            fontWeight: '800',
           }}
-          style={{
-            marginTop: getResponsiveHeight(20),
-          }}
+          uppercase
+          style={{ borderRadius: 5, marginTop: getResponsiveHeight(20) }}
           onPress={() => setVisible(false)}
-          contentStyle={{ height: getResponsiveHeight(60) }}
+          contentStyle={{ height: getResponsiveHeight(50) }}
         >
           Try again
         </Button>
@@ -345,7 +361,7 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
         }}
         backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
-        <List onSelect={handleWalletChange} />
+        <List onSelect={handleWalletChange} type="Fiat" />
       </BottomSheetModal>
 
       <BottomSheetModal
@@ -358,6 +374,7 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
         handleIndicatorStyle={{
           backgroundColor: colors.primary,
         }}
+        backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
         <PaymentMethod
           amount={showQuantity ? parseFloat(text) * exchange : parseFloat(text)}

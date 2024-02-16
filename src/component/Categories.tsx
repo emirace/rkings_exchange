@@ -16,9 +16,11 @@ interface Category {
 
 const categories: Category[] = [
   { id: '0', name: 'All' },
-  { id: '1', name: 'Category 1' },
-  { id: '2', name: 'Category 2' },
-  { id: '3', name: 'Category 3' },
+  { id: '1', name: 'Cloths' },
+  { id: '2', name: 'Phones' },
+  { id: '2', name: 'Electronics' },
+  { id: '2', name: 'Shoes' },
+  { id: '3', name: 'Furnitures' },
   // Add more categories as needed
 ];
 

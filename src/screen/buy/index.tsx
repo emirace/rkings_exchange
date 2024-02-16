@@ -60,7 +60,7 @@ const Buy: React.FC<BuyNavigationProp> = ({ navigation }) => {
           <ActivityIndicator />
         ) : (
           <FlatList
-            data={systemWallets}
+            data={systemWallets.filter((wal) => wal.type === 'Crypto')}
             keyExtractor={(item) => item._id}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}

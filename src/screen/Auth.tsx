@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   ImageBackground,
@@ -7,9 +7,18 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button, IconButton, List, Text, useTheme } from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Button,
+  IconButton,
+  List,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import {
   getResponsiveHeight,
   getResponsiveFontSize,
@@ -22,6 +31,7 @@ import Login from '../component/auth/Login';
 import Signup from '../component/auth/Signup';
 import { AuthNavigationProp } from '../type/navigation/stackNav';
 import ForgetPassword from '../component/auth/ForgetPassword';
+import useAuth from '../context/AuthContext';
 
 interface OnboardingItem {
   id: string;
@@ -35,24 +45,25 @@ const data: OnboardingItem[] = [
     id: '1',
     backgroundImage:
       'https://images.pexels.com/photos/14358442/pexels-photo-14358442.jpeg',
-    header: 'Welcome to MyApp',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    header: 'Welcome to RKings Exchange',
+    description:
+      'Embark on a revolutionary shopping experience powered by cryptocurrencies.',
   },
   {
     id: '2',
     backgroundImage:
       'https://images.pexels.com/photos/14358442/pexels-photo-14358442.jpeg',
-    header: 'Discover Exciting Features',
+    header: 'Trade and Exchange',
     description:
-      'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      'Easily buy, sell, and exchange cryptocurrencies. Seamlessly manage your digital assets and investments.',
   },
   {
     id: '3',
     backgroundImage:
       'https://images.pexels.com/photos/14358442/pexels-photo-14358442.jpeg',
-    header: 'Get Started Now',
+    header: 'Shop Anytime, Anywhere',
     description:
-      'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Discover the convenience of using cryptocurrencies for everyday purchases. From goods to services like data, airtime, and gift cards – RKings Exchange has it all.',
   },
 ];
 
@@ -63,11 +74,18 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
   route,
 }) => {
   const { colors } = useTheme();
+  const { loading, user } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef2 = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef3 = useRef<BottomSheetModal>(null);
+
+  useEffect(() => {
+    if (user) {
+      navigation.replace('HomeMain');
+    }
+  }, [user]);
 
   const openBottomSheet = () => {
     if (bottomSheetModalRef.current) {
@@ -109,6 +127,13 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
     openBottomSheet23();
   };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
   const renderItem = ({
     item,
     index,
@@ -133,7 +158,7 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
         />
         <Text
           style={styles.skip}
-          onPress={() => navigation.navigate('HomeMain')}
+          onPress={() => navigation.replace('HomeMain')}
         >
           Skip
         </Text>
@@ -167,7 +192,7 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
       <View
         style={{
           position: 'absolute',
-          bottom: 40,
+          bottom: Platform.OS === 'ios' ? getResponsiveHeight(30) : 0,
           left: 20,
           right: 20,
         }}
@@ -185,17 +210,16 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
         </View>
         <Button
           mode="contained"
-          contentStyle={{}}
-          labelStyle={{ fontSize: getResponsiveFontSize(22) }}
+          contentStyle={{ height: 50 }}
+          labelStyle={{ fontWeight: '800' }}
+          uppercase
           style={{
             marginBottom: getResponsiveHeight(20),
             borderRadius: 5,
-            height: 50,
-            justifyContent: 'center',
           }}
           onPress={openBottomSheet}
         >
-          Log in
+          Sign in
         </Button>
         <View style={styles.buttonsContainer}>
           <Text style={styles.registerText}>

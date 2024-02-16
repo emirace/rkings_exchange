@@ -1,15 +1,6 @@
-import { FlatList, View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import React from 'react';
-import {
-  Appbar,
-  Avatar,
-  Card,
-  Searchbar,
-  SegmentedButtons,
-  Text,
-} from 'react-native-paper';
-import { Wallet } from '../../type/wallet';
-import { getResponsiveHeight } from '../../utils/size';
+import { Appbar } from 'react-native-paper';
 import TopNavigation from '../../navigation/TopNavigation';
 import { DepositNavigationProp } from '../../type/navigation/stackNav';
 

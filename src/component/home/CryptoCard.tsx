@@ -2,6 +2,8 @@ import { View, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Text, Card, Avatar, ActivityIndicator } from 'react-native-paper';
 import { Wallet } from '../../type/wallet';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
+import { getCurrencySymbol } from '../../utils/currency';
 
 export interface PriceData {
   c: string;
@@ -64,7 +66,10 @@ const CryptoCard: React.FC<{ item: Wallet; navigation: any }> = ({
           <ActivityIndicator />
         ) : (
           <View style={styles.rateContainer}>
-            <Text style={styles.currencyRate}>{priceData.c}</Text>
+            <Text style={styles.currencyRate}>
+              {getCurrencySymbol('USD')}
+              {formatNumberWithCommasAndDecimals(priceData.c)}
+            </Text>
             <Text
               style={[
                 styles.percentageChange,
@@ -72,7 +77,7 @@ const CryptoCard: React.FC<{ item: Wallet; navigation: any }> = ({
               ]}
             >
               {isPriceIncreased ? '+' : ''}
-              {priceChange}%
+              {formatNumberWithCommasAndDecimals(priceChange, 4)}%
             </Text>
           </View>
         )}

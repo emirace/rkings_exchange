@@ -16,6 +16,8 @@ import {
 import { ProductProps } from '../type/product';
 import useAuth from './AuthContext';
 import { getBackendErrorMessage } from '../utils/error';
+import { convertCurrency, getConversionRate } from '../utils/currency';
+import { useWallet } from './WalletContext';
 
 interface Props {
   children: ReactNode;
@@ -38,6 +40,7 @@ export const ProductContext = createContext<
 // Create the ProductProvider component
 export const ProductProvider: React.FC<Props> = ({ children }) => {
   const { setAuthErrorModalOpen } = useAuth();
+  const { baseCurrency } = useWallet();
   const [products, setProducts] = useState<ProductProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -127,11 +130,33 @@ export const ProductProvider: React.FC<Props> = ({ children }) => {
     }
   };
 
+  const updateProducts = async (products: ProductProps[]) => {
+    setLoading(true);
+    const updatedProducts = await Promise.all(
+      products.map(async (product) => {
+        product.baseCostPrice = await convertCurrency(
+          product.costPrice,
+          product.currency,
+          baseCurrency?.currency
+        );
+        product.baseSellingPrice = await convertCurrency(
+          product.sellingPrice,
+          product.currency,
+          baseCurrency?.currency
+        );
+        return product;
+      })
+    );
+    setLoading(false);
+    setProducts(updatedProducts);
+  };
+
   useEffect(() => {
     setError('');
     fetchProductsService()
       .then((data) => {
         setProducts(data);
+        updateProducts(data);
         setLoading(false);
       })
       .catch((error) => {
@@ -139,6 +164,10 @@ export const ProductProvider: React.FC<Props> = ({ children }) => {
         handleError(getBackendErrorMessage(error));
       });
   }, []);
+
+  useEffect(() => {
+    updateProducts(products);
+  }, [baseCurrency]);
 
   return (
     <ProductContext.Provider

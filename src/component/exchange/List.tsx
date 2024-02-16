@@ -1,5 +1,5 @@
 import { View, FlatList, StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, Card, Searchbar, Text } from 'react-native-paper';
 import { getResponsiveHeight } from '../../utils/size';
 import { Wallet } from '../../type/wallet';
@@ -9,11 +9,22 @@ import { baseURL } from '../../services/api';
 interface Props {
   onSelect: (item: Wallet, position?: string) => void;
   position?: string;
+  type?: string;
 }
 
-const List: React.FC<Props> = ({ onSelect, position }) => {
+const List: React.FC<Props> = ({ onSelect, position, type }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const { systemWallets } = useWallet();
+  const [currentList, setCurrentList] = useState<Wallet[]>([]);
+
+  useEffect(() => {
+    console.log(type);
+    if (type) {
+      setCurrentList(systemWallets.filter((wal) => wal.type === type));
+    } else {
+      setCurrentList(systemWallets);
+    }
+  }, [type]);
 
   const handleClick = (value: Wallet) => {
     onSelect(value, position);
@@ -48,7 +59,7 @@ const List: React.FC<Props> = ({ onSelect, position }) => {
         value={searchQuery}
       />
       <FlatList
-        data={systemWallets}
+        data={currentList}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}

@@ -12,11 +12,13 @@ import { useSwap } from '../../context/SwapContext';
 import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
 import { baseURL } from '../../services/api';
 import { getConversionRate } from '../../utils/currency';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
 
 const Confirm: React.FC<{
   setVisible: (value: boolean) => void;
   navigation: any;
-}> = ({ setVisible, navigation }) => {
+  onClose: () => void;
+}> = ({ setVisible, navigation, onClose }) => {
   const { swapAmount, selectedWalletFrom, selectedWalletTo, transferFunds } =
     useSwap();
   const { colors } = useTheme();
@@ -57,6 +59,7 @@ const Confirm: React.FC<{
     } else {
       setLoading(false);
       setVisible(true);
+      onClose();
     }
   };
 
@@ -87,7 +90,8 @@ const Confirm: React.FC<{
           />
           <Text>From</Text>
           <Text variant="headlineSmall">
-            {swapAmount} {selectedWalletFrom?.currency}
+            {formatNumberWithCommasAndDecimals(swapAmount)}{' '}
+            {selectedWalletFrom?.currency}
           </Text>
         </View>
         <Icon
@@ -102,7 +106,11 @@ const Confirm: React.FC<{
           />
           <Text>To</Text>
           <Text variant="headlineSmall">
-            {exchange * parseFloat(swapAmount)} {selectedWalletTo?.currency}
+            {formatNumberWithCommasAndDecimals(
+              exchange * parseFloat(swapAmount),
+              selectedWalletTo.type === 'Crypto' ? 9 : 2
+            )}{' '}
+            {selectedWalletTo?.currency}
           </Text>
         </View>
       </View>
@@ -145,7 +153,10 @@ const Confirm: React.FC<{
             variant="bodyLarge"
             style={{ fontSize: getResponsiveFontSize(20) }}
           >
-            {exchange}
+            {formatNumberWithCommasAndDecimals(
+              exchange,
+              selectedWalletTo.type === 'Crypto' ? 9 : 2
+            )}
           </Text>
         </View>
         <View
@@ -173,11 +184,12 @@ const Confirm: React.FC<{
       <Button
         mode="contained"
         labelStyle={{
-          fontSize: getResponsiveFontSize(22),
-          fontWeight: '600',
+          fontWeight: '800',
         }}
+        uppercase
+        style={{ borderRadius: 5 }}
         onPress={handleConfirm}
-        contentStyle={{ height: getResponsiveHeight(60) }}
+        contentStyle={{ height: getResponsiveHeight(50) }}
         loading={loading}
       >
         Exchange

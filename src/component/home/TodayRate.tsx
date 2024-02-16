@@ -7,7 +7,11 @@ import {
   useTheme,
   ActivityIndicator,
 } from 'react-native-paper';
-import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
+import {
+  getResponsiveFontSize,
+  getResponsiveHeight,
+  getResponsiveWidth,
+} from '../../utils/size';
 import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
 import { useWallet } from '../../context/WalletContext';
 import { Wallet } from '../../type/wallet';
@@ -67,6 +71,7 @@ const TodayRate: React.FC<Props> = ({ headerComp, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
+    paddingHorizontal: getResponsiveWidth(20),
     flex: 1,
   },
   headerText: {

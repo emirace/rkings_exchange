@@ -3,10 +3,8 @@ import { FlatList, View, Animated, StyleSheet } from 'react-native';
 import CardListItem from './CardListItem';
 import { Wallet } from '../../type/wallet';
 import { FiatListNavigationProp } from '../../type/navigation/topNav';
-import { Searchbar } from 'react-native-paper';
-import { data } from '../../constant/data';
+import { Searchbar, Text } from 'react-native-paper';
 import { useWallet } from '../../context/WalletContext';
-import { Text } from 'react-native-paper';
 
 const FiatListy: React.FC<FiatListNavigationProp> = ({ navigation, route }) => {
   const { systemWallets } = useWallet();

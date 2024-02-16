@@ -108,15 +108,12 @@ export async function loginUser(credentials: {
 }): Promise<string> {
   try {
     const data: any = await api.post('/users/login', credentials);
-
+    // const data = { status: true, accessToken: '123456', data: '' };
     if (!data.status) {
       // Handle login error, e.g., display an error message to the user
       throw new Error('Login failed: ' + getBackendErrorMessage(data.data));
     }
-    console.log(data.accessToken);
-
     await SecureStore.setItemAsync('authToken', data.accessToken);
-
     return data.accessToken;
   } catch (error) {
     // Handle network errors or other exceptions
@@ -242,7 +239,7 @@ export async function updateUserByIdService(
   }
 }
 
-export async function logoutUser(): Promise<void> {
+export async function logoutUser(): Promise<boolean> {
   try {
     const { data } = await api.get('/users/logout');
 
@@ -252,6 +249,7 @@ export async function logoutUser(): Promise<void> {
     }
 
     SecureStore.deleteItemAsync('authToken');
+    return true;
   } catch (error) {
     // Handle network errors or other exceptions
     // You can log the error or perform other error-handling actions

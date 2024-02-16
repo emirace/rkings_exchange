@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    padding: getResponsiveHeight(25),
+    padding: getResponsiveHeight(20),
   },
   navItemText: {
     flex: 1,

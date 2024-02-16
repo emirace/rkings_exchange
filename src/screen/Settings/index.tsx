@@ -1,21 +1,26 @@
 import { View } from 'react-native';
 import React, { useState } from 'react';
-import { Menu, Divider, Text, Button, Appbar, List } from 'react-native-paper';
-import useTheme from '../../context/ThemeContext';
-import Logo from '../../component/Logo';
+import { Text, Button, Appbar, List, Modal, Dialog } from 'react-native-paper';
 import { getResponsiveFontSize, getResponsiveWidth } from '../../utils/size';
 import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
 import useAuth from '../../context/AuthContext';
+import { HomeNavigationProp } from '../../type/navigation/bottomNav';
 
-const Settings: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
+const Settings: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user, logout } = useAuth();
+  const [visible, setVisible] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigation.navigate('HomeMain');
+  const handleLogout = async () => {
+    await logout();
+    onDismiss();
+    navigation.navigate('Home');
+  };
+
+  const onDismiss = () => {
+    setVisible(false);
   };
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <Appbar.Header>
         <Appbar.Content title="Setting" />
       </Appbar.Header>
@@ -29,6 +34,7 @@ const Settings: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               fontSize: getResponsiveFontSize(22),
             }}
             left={() => <List.Icon icon="currency-usd" />}
+            descriptionStyle={{ fontSize: getResponsiveFontSize(18) }}
             right={() => <List.Icon icon="chevron-right" />}
             onPress={() => navigation.navigate('Currency')}
           />
@@ -39,6 +45,7 @@ const Settings: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
             titleStyle={{
               fontSize: getResponsiveFontSize(22),
             }}
+            descriptionStyle={{ fontSize: getResponsiveFontSize(18) }}
             left={() => <List.Icon icon="bell-outline" />}
             right={() => <List.Icon icon="chevron-right" />}
             // onPress={() => navigation.navigate('Appearance')}
@@ -54,6 +61,7 @@ const Settings: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
             }}
             left={() => <List.Icon icon="theme-light-dark" />}
             right={() => <List.Icon icon="chevron-right" />}
+            descriptionStyle={{ fontSize: getResponsiveFontSize(18) }}
             onPress={() => navigation.navigate('Appearance')}
           />
         </List.Section>
@@ -64,10 +72,21 @@ const Settings: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               fontSize: getResponsiveFontSize(22),
             }}
             left={() => <List.Icon icon="logout" />}
-            onPress={handleLogout}
+            onPress={() => setVisible(true)}
           />
         )}
       </View>
+
+      <Dialog visible={visible} onDismiss={onDismiss}>
+        <Dialog.Title>Logout</Dialog.Title>
+        <Dialog.Content>
+          <Text>Are you sure you want to logout?</Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={onDismiss}>Cancel</Button>
+          <Button onPress={handleLogout}>Logout</Button>
+        </Dialog.Actions>
+      </Dialog>
     </View>
   );
 };

@@ -19,6 +19,7 @@ export type RootStackParamList = {
   Appearance: undefined;
   Currency: undefined;
   Auth: undefined;
+  Profile: undefined;
   // Add other screen names and their params as needed
 };
 
@@ -110,4 +111,9 @@ export type CurrencyNavigationProp = NativeStackScreenProps<
 export type AuthNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   'Auth'
+>;
+
+export type ProfileNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'Profile'
 >;

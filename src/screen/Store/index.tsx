@@ -122,7 +122,7 @@ const Store: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
         // onEndReachedThreshold={0.1}
         ListHeaderComponent={headerComp}
         // ListFooterComponent={loading ? <ActivityIndicator animating /> : null}
-        style={{ paddingBottom: getResponsiveHeight(200), flex: 1 }}
+        style={{}}
       />
     </View>
   );

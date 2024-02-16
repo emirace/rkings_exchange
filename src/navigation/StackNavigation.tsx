@@ -21,17 +21,16 @@ import ToastNotification from '../component/ToastNotification';
 import Currency from '../screen/Settings/Currency';
 import useAuth from '../context/AuthContext';
 import { ActivityIndicator } from 'react-native-paper';
+import { View } from 'react-native';
+import Profile from '../screen/Profile';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function MainStackNav() {
-  const { user, loading } = useAuth();
-  return loading ? (
-    <ActivityIndicator />
-  ) : (
+  return (
     <>
       <ToastNotification />
-      <Stack.Navigator initialRouteName={user ? 'HomeMain' : 'Auth'}>
+      <Stack.Navigator initialRouteName={'Auth'}>
         <Stack.Screen
           name="HomeMain"
           component={MainBottomNav}
@@ -129,6 +128,12 @@ function MainStackNav() {
         <Stack.Screen
           name="Currency"
           component={Currency}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

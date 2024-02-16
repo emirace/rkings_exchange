@@ -10,8 +10,8 @@ import { useColorScheme } from 'react-native';
 
 type ThemeContextType = {
   themeMode: 'dark' | 'light';
-  selectedThemeMode: 'system' | 'dark' | 'light';
-  toggleTheme: (value: 'system' | 'dark' | 'light') => void;
+  selectedThemeMode: 'default' | 'dark' | 'light';
+  toggleTheme: (value: 'default' | 'dark' | 'light') => void;
   scrollY: number;
   setScrollY: (value: number) => void;
 };
@@ -25,6 +25,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<Props> = ({ children }) => {
   const [scrollY, setScrollY] = useState<number>(0);
   const colorScheme = useColorScheme();
+  console.log(colorScheme);
 
   const loadThemeMode = async () => {
     try {
@@ -32,8 +33,8 @@ export const ThemeProvider: React.FC<Props> = ({ children }) => {
         'selectedThemeMode'
       );
       const initialThemeMode = storedThemeMode
-        ? (storedThemeMode as 'system' | 'dark' | 'light')
-        : 'system';
+        ? (storedThemeMode as 'default' | 'dark' | 'light')
+        : 'default';
       setSelectedThemeMode(initialThemeMode);
     } catch (error) {
       console.error('Error loading theme mode:', error);
@@ -49,11 +50,11 @@ export const ThemeProvider: React.FC<Props> = ({ children }) => {
   };
 
   const [selectedThemeMode, setSelectedThemeMode] = useState<
-    'system' | 'dark' | 'light'
-  >('system');
+    'default' | 'dark' | 'light'
+  >('default');
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>('light');
 
-  const toggleTheme = (value: 'system' | 'dark' | 'light') => {
+  const toggleTheme = (value: 'default' | 'dark' | 'light') => {
     setSelectedThemeMode(value);
   };
 
@@ -67,9 +68,9 @@ export const ThemeProvider: React.FC<Props> = ({ children }) => {
     saveThemeMode();
   }, [selectedThemeMode]);
 
-  // Listen for system appearance changes
+  // Listen for default appearance changes
   useEffect(() => {
-    if (selectedThemeMode === 'system') {
+    if (selectedThemeMode === 'default') {
       setThemeMode(colorScheme as 'dark' | 'light');
     } else {
       setThemeMode(selectedThemeMode);

@@ -110,15 +110,14 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   const login = async (credentials: { email: string; password: string }) => {
     try {
       setError('');
-      setLoading(true);
+      // setLoading(true);
       const authenticatedToken = await loginUser(credentials);
       if (authenticatedToken) {
         setAuthToken(authenticatedToken);
-        setLoading(false);
         setAuthErrorModalOpen(false);
         return true;
       }
-      setLoading(false);
+      // setLoading(false);
       return false;
     } catch (error) {
       handleError(error);
@@ -129,9 +128,7 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   const sendForgetPasswordEmail = async (userData: { email: string }) => {
     try {
       setError('');
-      setLoading(true);
       const response = await forgetPasswordService(userData);
-      setLoading(false);
       return !!response;
     } catch (error) {
       handleError(error);
@@ -224,9 +221,10 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   };
 
   const logout = async () => {
-    // logoutUser();
+    // await logoutUser();
     setUser(null);
     await SecureStore.deleteItemAsync('authToken');
+    console.log('logout');
   };
 
   useEffect(() => {

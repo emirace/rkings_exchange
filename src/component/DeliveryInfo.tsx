@@ -102,8 +102,9 @@ const DeliveryInfo: React.FC<Props> = ({ onClose }) => {
         mode="contained"
         style={styles.proceedButton}
         onPress={handleProceedToPayment}
+        uppercase
         contentStyle={{ height: getResponsiveHeight(50) }}
-        labelStyle={{ fontWeight: '600', fontSize: getResponsiveFontSize(20) }}
+        labelStyle={{ fontWeight: '800' }}
       >
         Proceed to Payment
       </Button>
@@ -130,6 +131,7 @@ const styles = StyleSheet.create({
   },
   proceedButton: {
     marginVertical: getResponsiveHeight(30),
+    borderRadius: 5,
   },
 });
 

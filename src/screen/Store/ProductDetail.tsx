@@ -28,6 +28,9 @@ import { useProduct } from '../../context/ProductContext';
 import useCart from '../../context/CartContext';
 import useToastNotification from '../../context/ToastNotificationContext';
 import { baseURL } from '../../services/api';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
+import { useWallet } from '../../context/WalletContext';
+import { convertCurrency, getCurrencySymbol } from '../../utils/currency';
 
 const ProductDetail: React.FC<ProductDetailNavigationProp> = ({
   navigation,
@@ -35,6 +38,7 @@ const ProductDetail: React.FC<ProductDetailNavigationProp> = ({
 }) => {
   const id = route.params.productId;
   const { colors } = useTheme();
+  const { baseCurrency } = useWallet();
   const { fetchProductById } = useProduct();
   const { addNotification } = useToastNotification();
   const { addToCart, cart } = useCart();
@@ -48,6 +52,16 @@ const ProductDetail: React.FC<ProductDetailNavigationProp> = ({
       if (id) {
         const currentProduct = await fetchProductById(id);
 
+        currentProduct.baseCostPrice = await convertCurrency(
+          currentProduct.costPrice,
+          currentProduct.currency,
+          baseCurrency?.currency
+        );
+        currentProduct.baseSellingPrice = await convertCurrency(
+          currentProduct.sellingPrice,
+          currentProduct.currency,
+          baseCurrency?.currency
+        );
         if (currentProduct) {
           setProduct(currentProduct);
         }
@@ -228,7 +242,8 @@ const ProductDetail: React.FC<ProductDetailNavigationProp> = ({
               <Text>Price</Text>
               <View style={{ flexDirection: 'row', gap: 10 }}>
                 <Text style={[styles.price, { color: colors.primary }]}>
-                  {product.sellingPrice.toFixed(2)}
+                  {getCurrencySymbol(baseCurrency.currency)}
+                  {formatNumberWithCommasAndDecimals(product.baseSellingPrice)}
                 </Text>
 
                 <Text
@@ -237,16 +252,18 @@ const ProductDetail: React.FC<ProductDetailNavigationProp> = ({
                     { textDecorationLine: 'line-through', opacity: 0.5 },
                   ]}
                 >
-                  {product.costPrice.toFixed(2)}
+                  {getCurrencySymbol(baseCurrency.currency)}
+                  {formatNumberWithCommasAndDecimals(product.baseCostPrice)}
                 </Text>
               </View>
             </View>
             <Button
               mode="contained"
               labelStyle={{
-                fontSize: getResponsiveFontSize(22),
-                fontWeight: '600',
+                fontWeight: '800',
               }}
+              uppercase
+              style={{ borderRadius: 5 }}
               onPress={handleAddToCart}
               contentStyle={{ height: getResponsiveHeight(50) }}
               icon={'cart'}

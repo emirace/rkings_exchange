@@ -17,7 +17,10 @@ import { Wallet } from '../../type/wallet';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { getCurrencySymbol } from '../../utils/currency';
 import PayWithFlutterwave from 'flutterwave-react-native';
-import { generateTransactionRef } from '../../utils/helper';
+import {
+  formatNumberWithCommasAndDecimals,
+  generateTransactionRef,
+} from '../../utils/helper';
 import List from './List';
 
 interface Props {
@@ -74,7 +77,7 @@ const PaymentMethod: React.FC<Props> = ({
           style={{ fontWeight: 'bold', marginBottom: getResponsiveHeight(20) }}
         >
           Payment Method {getCurrencySymbol(currency)}
-          {amount}
+          {formatNumberWithCommasAndDecimals(amount)}
         </Text>
 
         <RadioButton.Group
@@ -141,11 +144,12 @@ const PaymentMethod: React.FC<Props> = ({
         <Button
           mode="contained"
           labelStyle={{
-            fontSize: getResponsiveFontSize(22),
-            fontWeight: '600',
+            fontWeight: '800',
           }}
           onPress={handlePayment}
-          contentStyle={{ height: getResponsiveHeight(60) }}
+          uppercase
+          style={{ borderRadius: 5 }}
+          contentStyle={{ height: getResponsiveHeight(50) }}
         >
           Continue
         </Button>
@@ -166,12 +170,13 @@ const PaymentMethod: React.FC<Props> = ({
             <Button
               mode="contained"
               labelStyle={{
-                fontSize: getResponsiveFontSize(22),
-                fontWeight: '600',
+                fontWeight: '800',
               }}
+              uppercase
+              style={{ borderRadius: 5 }}
               onPress={props.onPress}
               disabled={props.disabled}
-              contentStyle={{ height: getResponsiveHeight(60) }}
+              contentStyle={{ height: getResponsiveHeight(50) }}
             >
               Continue
             </Button>

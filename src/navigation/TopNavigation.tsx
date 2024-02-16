@@ -33,14 +33,14 @@ function TopNavigation() {
       }}
     >
       <Tab.Screen
-        name="CryptoList"
-        component={CryptoList}
-        options={{ tabBarLabel: 'Crypto' }}
-      />
-      <Tab.Screen
         name="FiatList"
         component={FiatList}
         options={{ tabBarLabel: 'Fiat' }}
+      />
+      <Tab.Screen
+        name="CryptoList"
+        component={CryptoList}
+        options={{ tabBarLabel: 'Crypto' }}
       />
     </Tab.Navigator>
   );

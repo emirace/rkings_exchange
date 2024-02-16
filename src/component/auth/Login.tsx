@@ -15,13 +15,14 @@ import { AuthNavigationProp } from '../../type/navigation/stackNav';
 const Login: React.FC<
   AuthNavigationProp & { gotoForgetPassword: () => void }
 > = ({ navigation, gotoForgetPassword }) => {
-  const { login, loading, error: loginError } = useAuth();
+  const { login, error: loginError } = useAuth();
   const { colors } = useTheme();
   const [email, setEmail] = useState('');
   const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -48,12 +49,14 @@ const Login: React.FC<
     } else if (!isValidEmail(email)) {
       setError('Please enter a valid email address.');
     } else {
+      setLoading(true);
       const result = await login({ email, password });
       if (result) {
-        navigation.navigate('HomeMain');
+        // navigation.navigate('HomeMain');
       } else {
         setError(loginError || '');
       }
+      setLoading(false);
     }
   };
 
@@ -108,12 +111,14 @@ const Login: React.FC<
       <Button
         mode="contained"
         onPress={handleLogin}
+        uppercase
         style={styles.loginButton}
-        labelStyle={{ fontSize: getResponsiveFontSize(22) }}
+        contentStyle={{ height: getResponsiveHeight(50) }}
+        labelStyle={{ fontWeight: '800' }}
         loading={loading}
         disabled={loading}
       >
-        Login
+        Sign in
       </Button>
       <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
@@ -157,9 +162,7 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     marginTop: 16,
-    height: getResponsiveHeight(50),
-    justifyContent: 'center',
-    borderRadius: 10,
+    borderRadius: 5,
   },
   errorText: {
     color: 'red',
@@ -168,6 +171,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     textAlign: 'right',
     textDecorationLine: 'underline',
+    fontSize: getResponsiveFontSize(18),
   },
   socialIconsContainer: {
     flexDirection: 'row',

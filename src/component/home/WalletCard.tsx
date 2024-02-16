@@ -6,6 +6,7 @@ import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
 import useAuth from '../../context/AuthContext';
 import { useWallet } from '../../context/WalletContext';
 import { getCurrencySymbol } from '../../utils/currency';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
 
 const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
@@ -74,8 +75,10 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
                   fontSize: getResponsiveFontSize(45),
                 }}
               >
-                {getCurrencySymbol(baseCurrency.currency)}
-                {totalBalance}
+                {getCurrencySymbol(baseCurrency.currency, {
+                  color: colors.onPrimary,
+                })}
+                {formatNumberWithCommasAndDecimals(totalBalance)}
               </Text>
             ) : (
               'xxxx'
@@ -126,11 +129,10 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
             buttonColor={colors.onPrimary}
             textColor={colors.primary}
             labelStyle={{
-              fontWeight: '600',
-              fontSize: getResponsiveFontSize(20),
+              fontWeight: '800',
             }}
-            rippleColor={colors.primaryContainer}
             onPress={() => handleCardPress('Buy')}
+            uppercase
           >
             Buy
           </Button>
@@ -138,9 +140,9 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
             mode="contained"
             buttonColor={colors.onPrimary}
             textColor={colors.primary}
+            uppercase
             labelStyle={{
-              fontWeight: '600',
-              fontSize: getResponsiveFontSize(20),
+              fontWeight: '800',
             }}
             onPress={() => handleCardPress('Sell')}
           >

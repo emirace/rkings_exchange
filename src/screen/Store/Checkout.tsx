@@ -13,10 +13,13 @@ import CustomBackdrop from '../../component/CustomBackdrop';
 import DeliveryInfo from '../../component/DeliveryInfo';
 import { useOrder } from '../../context/OrderContext';
 import useCart from '../../context/CartContext';
+import { useWallet } from '../../context/WalletContext';
+import LoginModal from '../../component/auth/LoginModal';
 
 const Checkout: React.FC<CheckoutNavigationProp> = ({ navigation }) => {
   const { colors } = useTheme();
   const { total } = useCart();
+  const { baseCurrency } = useWallet();
   const { shippingInfo } = useOrder();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isShipping, setIsShipping] = useState(false);
@@ -169,10 +172,14 @@ const Checkout: React.FC<CheckoutNavigationProp> = ({ navigation }) => {
           )}
         </View>
         {isShipping && (
-          <PaymentMethod amount={total} currency="NGN" onApprove={onApprove} />
+          <PaymentMethod
+            amount={total}
+            currency={baseCurrency.currency}
+            onApprove={onApprove}
+          />
         )}
       </View>
-
+      <LoginModal navigation={navigation} />
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}

@@ -66,7 +66,7 @@ export const CartProvider: React.FC<Props> = ({ children }) => {
 
   // Calculate subtotal and total
   const subtotal = cart.reduce(
-    (total, item) => total + item.sellingPrice * item.quantity,
+    (total, item) => total + item.baseSellingPrice * item.quantity,
     0
   );
   const total = subtotal;

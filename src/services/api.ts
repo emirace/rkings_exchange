@@ -5,15 +5,15 @@ import axios, {
 } from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-// export const baseURL = ''; // Replace with your API base URL
-// export const baseURL = 'http://192.168.43.11:5000'; // Replace with your API base URL
-// export const baseURL = 'http://172.20.10.2:5000'; // Replace with your API base URL
-export const baseURL = 'https://www.rkingsexchange.com'; // Replace with your API base URL
+// export const baseURL = '';
+// export const baseURL = 'http://192.168.43.11:5000';
+// export const baseURL = 'http://172.20.10.2:5000';
+export const baseURL = 'https://www.rkingsexchange.com';
 
 // Create an instance of Axios with custom configurations if needed
 const api = axios.create({
-  // baseURL: '/api', // Replace with your API base URL
-  // baseURL: 'https://rkingsexchange.com/api', // Replace with your API base URL
+  // baseURL: '/api',
+  // baseURL: 'https://rkingsexchange.com/api',
   baseURL: baseURL + '/api',
   // timeout: 10000, // Set a timeout (in milliseconds) for requests
   headers: {

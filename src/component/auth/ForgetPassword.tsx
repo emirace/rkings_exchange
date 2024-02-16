@@ -10,17 +10,13 @@ import useAuth from '../../context/AuthContext';
 import { useBottomSheetInternal } from '@gorhom/bottom-sheet';
 
 const ForgetPassword: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
-  const {
-    user,
-    sendForgetPasswordEmail,
-    loading,
-    error: forgetError,
-  } = useAuth();
+  const { user, sendForgetPasswordEmail, error: forgetError } = useAuth();
   const { colors } = useTheme();
   const [email, setEmail] = useState('');
   const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
   const [error, setError] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -43,10 +39,12 @@ const ForgetPassword: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
     } else if (!isValidEmail(email)) {
       setError('Please enter a valid email address.');
     } else {
+      setLoading(true);
       const result = await sendForgetPasswordEmail({ email });
       if (result) {
         setResetSuccess(true);
       }
+      setLoading(false);
       // Reset error state
       setError(forgetError || '');
     }
@@ -82,6 +80,8 @@ const ForgetPassword: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
         <Button
           mode="contained"
           onPress={handleResetPassword}
+          contentStyle={{ height: getResponsiveHeight(50) }}
+          uppercase
           style={styles.resetButton}
           labelStyle={{ color: 'white' }}
           loading={loading}
@@ -142,8 +142,7 @@ const styles = StyleSheet.create({
   },
   resetButton: {
     marginTop: 16,
-    height: getResponsiveHeight(50),
-    justifyContent: 'center',
+    borderRadius: 5,
   },
   errorText: {
     color: 'red',

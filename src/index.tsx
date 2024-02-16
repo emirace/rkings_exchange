@@ -25,6 +25,8 @@ import { WithdrawProvider } from './context/WithdrawContext';
 import { ProductProvider } from './context/ProductContext';
 import { ToastNotificationProvider } from './context/ToastNotificationContext';
 import { CartProvider } from './context/CartContext';
+import { StatusBar } from 'expo-status-bar';
+import { CandlesProvider } from './context/CandlesContext';
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -42,6 +44,10 @@ const Main = () => {
       : { ...MD3LightTheme, colors: lightTheme.colors };
   return (
     <PaperProvider theme={paperTheme}>
+      <StatusBar
+        animated={true}
+        style={themeMode === 'dark' ? 'light' : 'dark'}
+      />
       <NavigationContainer
         theme={themeMode === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme}
       >
@@ -56,7 +62,9 @@ const Main = () => {
                         <ProductProvider>
                           <CartProvider>
                             <BottomSheetModalProvider>
-                              <MainStackNav />
+                              <CandlesProvider>
+                                <MainStackNav />
+                              </CandlesProvider>
                             </BottomSheetModalProvider>
                           </CartProvider>
                         </ProductProvider>

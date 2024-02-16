@@ -192,11 +192,12 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
           <Button
             mode="contained"
             labelStyle={{
-              fontSize: getResponsiveFontSize(22),
-              fontWeight: '600',
+              fontWeight: '800',
             }}
+            uppercase
+            style={{ borderRadius: 5 }}
             onPress={handleDeposit}
-            contentStyle={{ height: getResponsiveHeight(60) }}
+            contentStyle={{ height: getResponsiveHeight(50) }}
           >
             Continue
           </Button>

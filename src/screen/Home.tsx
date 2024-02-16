@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import {
   Appbar,
   Avatar,
@@ -31,20 +31,18 @@ const Home: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
       >
         <Logo />
         {user ? (
-          <Button>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Profile')}
+            style={{ marginHorizontal: getResponsiveWidth(10) }}
+          >
             <Avatar.Image
               size={getResponsiveHeight(50)}
               source={{
                 uri: baseURL + user.image,
               }}
             />
-          </Button>
-        ) : // <IconButton
-        //   icon={'login-variant'}
-        //   size={30}
-        //   onPress={() => navigation.navigate('Auth')}
-        // />
-        null}
+          </TouchableOpacity>
+        ) : null}
       </Appbar.Header>
       <TodayRate
         navigation={navigation}
@@ -57,7 +55,6 @@ const Home: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: getResponsiveWidth(20),
     flex: 1,
   },
 });

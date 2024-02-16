@@ -19,10 +19,14 @@ import useCart, { CartItem } from '../../context/CartContext';
 import useToastNotification from '../../context/ToastNotificationContext';
 import { useProduct } from '../../context/ProductContext';
 import { baseURL } from '../../services/api';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
+import { getCurrencySymbol } from '../../utils/currency';
+import { useWallet } from '../../context/WalletContext';
 
 const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
   const { cart, removeFromCart, addToCart, subtotal, total, clearCart } =
     useCart();
+  const { baseCurrency } = useWallet();
   const { fetchProductById } = useProduct();
   const { addNotification } = useToastNotification();
   const { colors } = useTheme();
@@ -70,7 +74,10 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
                 marginTop: getResponsiveHeight(10),
               }}
             >
-              <Text>{item.sellingPrice.toFixed(2)}</Text>
+              <Text>
+                {getCurrencySymbol(baseCurrency.currency)}
+                {formatNumberWithCommasAndDecimals(item.baseSellingPrice)}
+              </Text>
               <Text>Size: {item.selectedSize}</Text>
             </View>
           </View>
@@ -96,12 +103,6 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
             }
           />
         </View>
-        {/* <Button
-            icon="delete"
-            // onPress={() => removeItem(item.id)}
-          >
-            Remove
-          </Button> */}
       </Card.Content>
     </Card>
   );
@@ -153,7 +154,8 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
               opacity: 0.5,
             }}
           >
-            {subtotal}
+            {getCurrencySymbol(baseCurrency.currency)}
+            {formatNumberWithCommasAndDecimals(subtotal)}
           </Text>
         </View>
         <View
@@ -203,17 +205,19 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
             variant="titleLarge"
             style={{ fontWeight: '600', fontSize: getResponsiveFontSize(22) }}
           >
-            {total}
+            {getCurrencySymbol(baseCurrency.currency)}
+            {formatNumberWithCommasAndDecimals(total)}
           </Text>
         </View>
         <Button
           mode="contained"
           labelStyle={{
-            fontSize: getResponsiveFontSize(22),
-            fontWeight: '600',
+            fontWeight: '800',
           }}
+          uppercase
+          style={{ borderRadius: 5 }}
           onPress={handleCheckout}
-          contentStyle={{ height: getResponsiveHeight(60) }}
+          contentStyle={{ height: getResponsiveHeight(50) }}
         >
           Check Out
         </Button>

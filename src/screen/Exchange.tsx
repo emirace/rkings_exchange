@@ -24,6 +24,7 @@ import CustomBackdrop from '../component/CustomBackdrop';
 import { ExchangeNavigationProp } from '../type/navigation/stackNav';
 import { getConversionRate, getCurrencySymbol } from '../utils/currency';
 import { useWallet } from '../context/WalletContext';
+import { formatNumberWithCommasAndDecimals } from '../utils/helper';
 
 const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
   const {
@@ -111,6 +112,12 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
   const openBottomSheet2 = () => {
     if (bottomSheetModalRef2.current) {
       bottomSheetModalRef2.current.present();
+    }
+  };
+
+  const onClose = () => {
+    if (bottomSheetModalRef2.current) {
+      bottomSheetModalRef2.current?.dismiss();
     }
   };
 
@@ -211,7 +218,8 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
                   }}
                 >
                   {getCurrencySymbol(selectedWalletFrom?.currency)}
-                  {wallet?.balance || 0} available
+                  {formatNumberWithCommasAndDecimals(wallet?.balance || 0)}{' '}
+                  available
                 </Text>
               </View>
               <TouchableOpacity
@@ -239,9 +247,18 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
             >
               <View>
                 <Text variant="titleMedium">You get</Text>
-                <Text variant="displaySmall" style={{ marginBottom: 10 }}>
+                <Text
+                  numberOfLines={1}
+                  variant="displaySmall"
+                  style={{ marginBottom: 10 }}
+                >
                   {getCurrencySymbol(selectedWalletTo.currency)}
-                  {swapAmount ? exchange * parseFloat(swapAmount) : ''}
+                  {swapAmount
+                    ? formatNumberWithCommasAndDecimals(
+                        exchange * parseFloat(swapAmount),
+                        selectedWalletTo.type === 'Crypto' ? 9 : 2
+                      )
+                    : ''}
                 </Text>
                 <Text
                   variant="titleMedium"
@@ -254,7 +271,10 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
                   {exchangeLoading ? (
                     <ActivityIndicator size={10} />
                   ) : (
-                    exchange
+                    formatNumberWithCommasAndDecimals(
+                      exchange,
+                      selectedWalletTo.type === 'Crypto' ? 9 : 2
+                    )
                   )}{' '}
                   to {getCurrencySymbol(selectedWalletFrom.currency)}
                 </Text>
@@ -278,9 +298,10 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
           <Button
             mode="contained"
             labelStyle={{
-              fontSize: getResponsiveFontSize(22),
-              fontWeight: '600',
+              fontWeight: '800',
             }}
+            uppercase
+            style={{ borderRadius: 5 }}
             onPress={handleExchange}
             contentStyle={{ height: getResponsiveHeight(60) }}
           >
@@ -318,11 +339,12 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
         <Button
           mode="contained"
           labelStyle={{
-            fontSize: getResponsiveFontSize(22),
-            fontWeight: '600',
+            fontWeight: '800',
           }}
+          uppercase
           style={{
             marginTop: getResponsiveHeight(20),
+            borderRadius: 5,
           }}
           onPress={() => setVisible(false)}
           contentStyle={{ height: getResponsiveHeight(60) }}
@@ -360,7 +382,11 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
         }}
         backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
-        <Confirm setVisible={setVisible} navigation={navigation} />
+        <Confirm
+          setVisible={setVisible}
+          onClose={onClose}
+          navigation={navigation}
+        />
       </BottomSheetModal>
     </View>
   );

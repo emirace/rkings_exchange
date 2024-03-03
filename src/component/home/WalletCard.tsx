@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { Button, Icon, IconButton, Text, useTheme } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,7 +14,7 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { totalBalance, baseCurrency } = useWallet();
   const [show, setShow] = useState(true);
 
-  const handleCardPress = (value: 'Buy' | 'Sell') => {
+  const handleCardPress = (value: 'Buy' | 'Sell' | 'Transactions') => {
     navigation.navigate(value);
   };
   return user ? (
@@ -81,7 +81,7 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
                 {formatNumberWithCommasAndDecimals(totalBalance)}
               </Text>
             ) : (
-              'xxxx'
+              '****'
             )}
           </Text>
         </View>
@@ -99,12 +99,13 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
           alignItems: 'center',
         }}
       >
-        <View
+        <TouchableOpacity
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             gap: 5,
           }}
+          onPress={() => handleCardPress('Transactions')}
         >
           <Icon size={20} source="chart-bar" color={colors.onPrimary} />
           <Text
@@ -116,7 +117,7 @@ const WalletCard: React.FC<{ navigation: any }> = ({ navigation }) => {
           >
             Transactions
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <View
           style={{

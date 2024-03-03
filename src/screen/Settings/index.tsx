@@ -1,6 +1,14 @@
 import { View } from 'react-native';
 import React, { useState } from 'react';
-import { Text, Button, Appbar, List, Modal, Dialog } from 'react-native-paper';
+import {
+  Text,
+  Button,
+  Appbar,
+  List,
+  Modal,
+  Dialog,
+  useTheme,
+} from 'react-native-paper';
 import { getResponsiveFontSize, getResponsiveWidth } from '../../utils/size';
 import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
 import useAuth from '../../context/AuthContext';
@@ -9,6 +17,7 @@ import { HomeNavigationProp } from '../../type/navigation/bottomNav';
 const Settings: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [visible, setVisible] = useState(false);
+  const { colors } = useTheme();
 
   const handleLogout = async () => {
     await logout();
@@ -20,7 +29,7 @@ const Settings: React.FC<{ navigation: any }> = ({ navigation }) => {
     setVisible(false);
   };
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Appbar.Header>
         <Appbar.Content title="Setting" />
       </Appbar.Header>

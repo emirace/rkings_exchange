@@ -27,6 +27,7 @@ interface WalletContextData {
   loading: boolean;
   error: string;
   fetchWallets: () => void;
+  fetchSystemWallets: () => void;
   depositWallet: (
     paymentProvider: string,
     transactionId: number,
@@ -141,11 +142,13 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
 
   const fetchWallets = async () => {
     try {
+      if (!user) return false;
       setLoading(true);
       const walletData = await fetchWalletsService();
       setWallets(walletData);
       setLoading(false);
       await updateWallets(walletData);
+      return true;
     } catch (error) {
       handleError(error);
       return false;
@@ -157,9 +160,9 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
       setError('');
       setLoading(true);
       const walletData = await fetchSystemWalletsService();
-      console.log(walletData);
       setSystemWallets(walletData);
       setLoading(false);
+      return true;
     } catch (error) {
       handleError(error);
       setLoading(false);
@@ -318,6 +321,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
         deleteSystemWallet,
         setBaseCurrency,
         fetchWallets,
+        fetchSystemWallets,
         depositWallet,
         sendCrypto,
       }}

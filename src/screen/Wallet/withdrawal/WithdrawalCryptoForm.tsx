@@ -9,14 +9,17 @@ import {
   Card,
   Divider,
 } from 'react-native-paper';
-import { Wallet } from '../../type/wallet';
-import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
-import { DepositCryptoFormNavigationProp } from '../../type/navigation/stackNav';
-import { data } from '../../constant/data';
-import { useDeposit } from '../../context/DepositContext';
-import { useWallet } from '../../context/WalletContext';
+import { Wallet } from '../../../type/wallet';
+import {
+  getResponsiveFontSize,
+  getResponsiveHeight,
+} from '../../../utils/size';
+import { WithdrawalCryptoFormNavigationProp } from '../../../type/navigation/stackNav';
+import { data } from '../../../constant/data';
+import { useDeposit } from '../../../context/DepositContext';
+import { useWallet } from '../../../context/WalletContext';
 
-const DepositCryptoForm: React.FC<DepositCryptoFormNavigationProp> = ({
+const WithdrawalCryptoForm: React.FC<WithdrawalCryptoFormNavigationProp> = ({
   navigation,
   route,
 }) => {
@@ -163,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DepositCryptoForm;
+export default WithdrawalCryptoForm;

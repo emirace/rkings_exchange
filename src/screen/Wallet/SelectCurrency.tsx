@@ -2,10 +2,15 @@ import { View } from 'react-native';
 import React from 'react';
 import { Appbar } from 'react-native-paper';
 import TopNavigation from '../../navigation/TopNavigation';
-import { DepositNavigationProp } from '../../type/navigation/stackNav';
+import { SelectCurrencyNavigationProp } from '../../type/navigation/stackNav';
+import LoginModal from '../../component/auth/LoginModal';
 
-const Deposit: React.FC<DepositNavigationProp> = ({ navigation }) => {
+const SelectCurrency: React.FC<SelectCurrencyNavigationProp> = ({
+  navigation,
+  route,
+}) => {
   const _goBack = () => navigation.goBack();
+  const { type } = route.params;
 
   return (
     <View style={{ flex: 1 }}>
@@ -14,10 +19,11 @@ const Deposit: React.FC<DepositNavigationProp> = ({ navigation }) => {
         <Appbar.Content title="Choose Currency" />
       </Appbar.Header>
       <View style={{ flex: 1, paddingHorizontal: 20 }}>
-        <TopNavigation />
+        <TopNavigation type={type} />
       </View>
+      <LoginModal navigation={navigation} />
     </View>
   );
 };
 
-export default Deposit;
+export default SelectCurrency;

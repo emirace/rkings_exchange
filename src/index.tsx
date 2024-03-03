@@ -27,6 +27,8 @@ import { ToastNotificationProvider } from './context/ToastNotificationContext';
 import { CartProvider } from './context/CartContext';
 import { StatusBar } from 'expo-status-bar';
 import { CandlesProvider } from './context/CandlesContext';
+import { VerificationProvider } from './context/VerificationContext';
+import { TransactionProvider } from './context/TransactionContext';
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -61,11 +63,15 @@ const Main = () => {
                       <WithdrawProvider>
                         <ProductProvider>
                           <CartProvider>
-                            <BottomSheetModalProvider>
-                              <CandlesProvider>
-                                <MainStackNav />
-                              </CandlesProvider>
-                            </BottomSheetModalProvider>
+                            <VerificationProvider>
+                              <BottomSheetModalProvider>
+                                <CandlesProvider>
+                                  <TransactionProvider>
+                                    <MainStackNav />
+                                  </TransactionProvider>
+                                </CandlesProvider>
+                              </BottomSheetModalProvider>
+                            </VerificationProvider>
                           </CartProvider>
                         </ProductProvider>
                       </WithdrawProvider>

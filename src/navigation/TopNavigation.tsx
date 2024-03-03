@@ -4,10 +4,15 @@ import CryptoList from '../component/deposit/CryptoList';
 import FiatList from '../component/deposit/FiatList';
 import { RootTopParamList } from '../type/navigation/topNav';
 import { useTheme } from 'react-native-paper';
+import { Dimensions } from 'react-native';
 
+interface Props {
+  type: string;
+}
 const Tab = createMaterialTopTabNavigator<RootTopParamList>();
+const { width } = Dimensions.get('window');
 
-function TopNavigation() {
+const TopNavigation: React.FC<Props> = ({ type }) => {
   const { colors } = useTheme();
 
   return (
@@ -25,8 +30,8 @@ function TopNavigation() {
         },
         tabBarIndicatorStyle: {
           backgroundColor: colors.primary,
-          maxWidth: '50%',
-          marginLeft: '9.3%',
+          maxWidth: 0.25 * width,
+          marginLeft: 0.093 * width,
           height: 3,
           borderRadius: 5,
         },
@@ -36,14 +41,16 @@ function TopNavigation() {
         name="FiatList"
         component={FiatList}
         options={{ tabBarLabel: 'Fiat' }}
+        initialParams={{ type }}
       />
       <Tab.Screen
         name="CryptoList"
         component={CryptoList}
         options={{ tabBarLabel: 'Crypto' }}
+        initialParams={{ type }}
       />
     </Tab.Navigator>
   );
-}
+};
 
 export default TopNavigation;

@@ -102,22 +102,26 @@ const ProductItem: React.FC<Props> = ({ item, index, navigation }) => {
           <Text
             numberOfLines={1}
             style={{
-              fontWeight: '600',
+              fontWeight: '800',
               marginBottom: 5,
               width: getResponsiveWidth(100),
             }}
           >
             {item.name}
           </Text>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{}}>
             <Text>
               {getCurrencySymbol(baseCurrency.currency)}
               {formatNumberWithCommasAndDecimals(item.baseSellingPrice)}
             </Text>
-            <Text style={{ opacity: 0.5, textDecorationLine: 'line-through' }}>
-              {getCurrencySymbol(baseCurrency.currency)}
-              {formatNumberWithCommasAndDecimals(item.baseCostPrice)}
-            </Text>
+            {discount ? (
+              <Text
+                style={{ opacity: 0.5, textDecorationLine: 'line-through' }}
+              >
+                {getCurrencySymbol(baseCurrency.currency)}
+                {formatNumberWithCommasAndDecimals(item.baseCostPrice)}
+              </Text>
+            ) : null}
           </View>
         </View>
         <IconButton
@@ -129,7 +133,7 @@ const ProductItem: React.FC<Props> = ({ item, index, navigation }) => {
           style={{
             position: 'absolute',
             right: 0,
-            top: 0,
+            // top: 0,
             backgroundColor: colors.onPrimary,
           }}
         />

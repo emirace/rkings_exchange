@@ -11,6 +11,7 @@ const CryptoList: React.FC<CryptoListNavigationProp> = ({
   navigation,
   route,
 }) => {
+  const { type } = route.params;
   const { systemWallets } = useWallet();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState<Wallet[]>([]);
@@ -21,7 +22,7 @@ const CryptoList: React.FC<CryptoListNavigationProp> = ({
     <CardListItem
       item={item}
       navigation={navigation}
-      screen="DepositCryptoForm"
+      screen={type === 'Deposit' ? 'DepositCryptoForm' : 'WithdrawalCryptoForm'}
     />
   );
 

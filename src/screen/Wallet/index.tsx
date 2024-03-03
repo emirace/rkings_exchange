@@ -1,6 +1,13 @@
-import { FlatList, View, StyleSheet, Animated } from 'react-native';
-import React, { useRef } from 'react';
 import {
+  FlatList,
+  View,
+  StyleSheet,
+  Animated,
+  RefreshControl,
+} from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  ActivityIndicator,
   Appbar,
   Avatar,
   Button,
@@ -15,25 +22,33 @@ import {
   getResponsiveFontSize,
   getResponsiveHeight,
   getResponsiveWidth,
-} from '../utils/size';
-import { Wallet as WalletProps } from '../type/wallet';
-import { HomeScreenNavigationProp } from '../type/navigation/stackNav';
-import { useWallet } from '../context/WalletContext';
-import { getCurrencySymbol } from '../utils/currency';
-import { data } from '../constant/data';
-import { baseURL } from '../services/api';
+} from '../../utils/size';
+import { Wallet as WalletProps } from '../../type/wallet';
+import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
+import { useWallet } from '../../context/WalletContext';
+import { getCurrencySymbol } from '../../utils/currency';
+import { data } from '../../constant/data';
+import { baseURL } from '../../services/api';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import List from '../component/exchange/List';
-import CustomBackdrop from '../component/CustomBackdrop';
-import LoginModal from '../component/auth/LoginModal';
-import { formatNumberWithCommasAndDecimals } from '../utils/helper';
+import List from '../../component/exchange/List';
+import CustomBackdrop from '../../component/CustomBackdrop';
+import LoginModal from '../../component/auth/LoginModal';
+import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
 
 const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
-  const { totalBalance, isVisible, updateIsVisible, wallets, baseCurrency } =
-    useWallet();
+  const {
+    totalBalance,
+    isVisible,
+    updateIsVisible,
+    wallets,
+    baseCurrency,
+    fetchSystemWallets,
+    fetchWallets,
+  } = useWallet();
   const { colors } = useTheme();
   const scrollY = new Animated.Value(0);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const openBottomSheet = () => {
     if (bottomSheetModalRef.current) {
@@ -43,6 +58,13 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
 
   const handleWalletCreate = () => {
     bottomSheetModalRef.current?.dismiss();
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchSystemWallets();
+    await fetchWallets();
+    setRefreshing(false);
   };
 
   const renderItem = ({ item }: { item: WalletProps }) => (
@@ -73,10 +95,11 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
     </Card>
   );
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Appbar.Header style={{ zIndex: 3 }}>
         <Appbar.Content title="My Assets" />
       </Appbar.Header>
+      {refreshing && <ActivityIndicator />}
       <View style={{ paddingHorizontal: getResponsiveWidth(20), flex: 1 }}>
         <Animated.View
           style={[
@@ -105,10 +128,9 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
           </View>
           <Text
             style={{
-              fontSize: getResponsiveFontSize(36),
+              fontSize: getResponsiveFontSize(45),
               marginVertical: getResponsiveHeight(10),
               fontWeight: '600',
-              height: getResponsiveHeight(38),
             }}
           >
             {isVisible ? (
@@ -142,7 +164,9 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               }}
               uppercase
               style={{ borderRadius: 5, flex: 1 }}
-              onPress={() => navigation.navigate('Deposit')}
+              onPress={() =>
+                navigation.navigate('SelectCurrency', { type: 'Deposit' })
+              }
               contentStyle={{ height: getResponsiveHeight(50) }}
             >
               Deposit
@@ -156,7 +180,9 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
               }}
               uppercase
               style={{ borderRadius: 5, flex: 1 }}
-              // onPress={handleExchange}
+              onPress={() =>
+                navigation.navigate('SelectCurrency', { type: 'Withdrawal' })
+              }
               contentStyle={{ height: getResponsiveHeight(50) }}
             >
               Withdrawal
@@ -193,6 +219,9 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
             { useNativeDriver: false }
           )}
           scrollEventThrottle={16}
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={onRefresh} />
+          }
         />
       </View>
       <LoginModal navigation={navigation} />

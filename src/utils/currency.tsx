@@ -45,7 +45,6 @@ export const getConversionRate = async (
     return response.rate.exchangeRate;
   } catch (error) {
     const errorMessage = getBackendErrorMessage(error);
-    console.error(errorMessage);
     // Re-throw the error to propagate it up the call stack if needed
     throw errorMessage;
   }

@@ -5,6 +5,7 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import {
@@ -29,6 +30,9 @@ import { Wallet } from '../type/wallet';
 import { useWallet } from '../context/WalletContext';
 import { useCandles } from '../context/CandlesContext';
 import axios from 'axios';
+import { socketBinance } from '../socket';
+import api from '../services/api';
+import useAuth from '../context/AuthContext';
 
 const WIDTH = Dimensions.get('screen').width;
 
@@ -39,6 +43,7 @@ const CryptoDetail: React.FC<CryptoDetailNavigationProp> = ({
   const { colors } = useTheme();
   const { systemWallets } = useWallet();
   const { crypto: cryptoId } = route.params;
+  const { user } = useAuth();
   const [crypto, setCrypto] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingChart, setLoadingChart] = useState(true);
@@ -48,6 +53,7 @@ const CryptoDetail: React.FC<CryptoDetailNavigationProp> = ({
   const [high, setHigh] = useState<number | null>(null);
   const [low, setLow] = useState<number | null>(null);
   const [data, setData] = useState<number[]>([0]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const socketRef = useRef<WebSocket | null>(null);
 
@@ -63,31 +69,19 @@ const CryptoDetail: React.FC<CryptoDetailNavigationProp> = ({
   }, [cryptoId]);
 
   useEffect(() => {
-    // Initialize WebSocket connection when the component mounts
-    const initWebSocket = () => {
-      if (!crypto) return;
-      const socket = new WebSocket(
-        `wss://stream.binance.com:9443/ws/${crypto?.currency.toLowerCase()}usdt@ticker`
-      );
+    socketBinance.on(`${crypto?.currency.toLowerCase()}usdt/ticker`, (data) => {
+      setPrice(parseFloat(data.c));
+      setDailyPercentage(parseFloat(data.P));
+      setHigh(parseFloat(data.h));
+      setLow(parseFloat(data.l));
+    });
 
-      socket.onmessage = (event) => {
-        const eventData = JSON.parse(event.data);
-        setPrice(parseFloat(eventData.c));
-        setDailyPercentage(parseFloat(eventData.P));
-        setHigh(parseFloat(eventData.h));
-        setLow(parseFloat(eventData.l));
-      };
-
-      socket.onclose = () => {
-        // Reconnect on close (implement a more sophisticated reconnection logic)
-        setTimeout(initWebSocket, 1000);
-      };
-
-      socketRef.current = socket;
+    return () => {
+      // Close WebSocket connection when the component unmounts
     };
+  }, [crypto?.currency]);
 
-    initWebSocket();
-
+  useEffect(() => {
     return () => {
       // Close WebSocket connection when the component unmounts
       if (socketRef.current) {
@@ -100,16 +94,13 @@ const CryptoDetail: React.FC<CryptoDetailNavigationProp> = ({
     if (!crypto) return;
     try {
       setLoadingChart(true);
-      const response = await axios.get(
-        `https://api.binance.com/api/v3/klines`,
-        {
-          params: {
-            symbol: `${crypto?.currency}USDT`,
-            interval: timeFrame,
-            limit: 50,
-          },
-        }
-      );
+      const response = await api.get(`/trades/candles`, {
+        params: {
+          symbol: `${crypto?.currency}USDT`,
+          interval: timeFrame,
+          limit: 50,
+        },
+      });
 
       const formattedData = response.data.map((item: number[]) => item[4]);
 
@@ -138,6 +129,11 @@ const CryptoDetail: React.FC<CryptoDetailNavigationProp> = ({
   const handleSell = () => {
     navigation.navigate('SellForm', { currency: crypto?.currency || '' });
   };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  };
 
   return (
     <View
@@ -159,7 +155,11 @@ const CryptoDetail: React.FC<CryptoDetailNavigationProp> = ({
       ) : !crypto ? (
         <Text>Crypto data not found</Text>
       ) : (
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <View style={{ padding: getResponsiveWidth(20) }}>
             <Text style={styles.subtitle}>{crypto.currency}</Text>
             <Text style={styles.title}>{crypto.name}</Text>
@@ -255,22 +255,27 @@ const CryptoDetail: React.FC<CryptoDetailNavigationProp> = ({
                 />
               )}
               right={() => <List.Icon icon="chevron-right" />}
-              onPress={() => navigation.navigate('Deposit')}
+              onPress={() =>
+                navigation.navigate('SelectCurrency', { type: 'Deposit' })
+              }
             />
-
-            <List.Item
-              title="Transaction"
-              description={`View your order history`}
-              titleStyle={{
-                fontSize: getResponsiveFontSize(22),
-                // color: colors.primary,
-                fontWeight: '600',
-              }}
-              descriptionStyle={{ fontSize: getResponsiveFontSize(18) }}
-              left={() => <List.Icon icon="chart-bar" color={colors.primary} />}
-              right={() => <List.Icon icon="chevron-right" />}
-              // onPress={() => navigation.navigate('Deposit')}
-            />
+            {user && (
+              <List.Item
+                title="Transaction"
+                description={`View your order history`}
+                titleStyle={{
+                  fontSize: getResponsiveFontSize(22),
+                  // color: colors.primary,
+                  fontWeight: '600',
+                }}
+                descriptionStyle={{ fontSize: getResponsiveFontSize(18) }}
+                left={() => (
+                  <List.Icon icon="chart-bar" color={colors.primary} />
+                )}
+                right={() => <List.Icon icon="chevron-right" />}
+                onPress={() => navigation.navigate('Transactions')}
+              />
+            )}
           </View>
         </ScrollView>
       )}
@@ -329,6 +334,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     gap: 10,
     padding: getResponsiveHeight(20),
+    paddingBottom: getResponsiveHeight(40),
   },
 
   optionsContainer: {

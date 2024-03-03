@@ -12,14 +12,18 @@ const BottomNavBar: React.FC<BottomNavbarProps> = ({ navigation, onClose }) => {
   const { colors } = useTheme();
 
   const handleNavigation = (
-    screen: 'Buy' | 'Sell' | 'Exchange' | 'Deposit'
+    screen: 'Buy' | 'Sell' | 'Exchange' | 'SelectCurrency'
   ) => {
-    navigation.navigate(screen);
+    if (screen === 'SelectCurrency') {
+      navigation.navigate('SelectCurrency', { type: 'Deposit' });
+    } else {
+      navigation.navigate(screen);
+    }
     onClose();
   };
 
   const renderNavItem = (
-    screen: 'Buy' | 'Sell' | 'Exchange' | 'Deposit',
+    screen: 'Buy' | 'Sell' | 'Exchange' | 'SelectCurrency',
     icon: string,
     title: string,
     description: string
@@ -57,7 +61,12 @@ const BottomNavBar: React.FC<BottomNavbarProps> = ({ navigation, onClose }) => {
         'Exchange one crypto for another'
       )}
       <Divider style={styles.divider} />
-      {renderNavItem('Deposit', 'plus-circle', 'Deposit', 'Fund your wallet')}
+      {renderNavItem(
+        'SelectCurrency',
+        'plus-circle',
+        'Deposit',
+        'Fund your wallet'
+      )}
     </View>
   );
 };

@@ -1,8 +1,8 @@
 import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 
 export type RootTopParamList = {
-  FiatList: undefined;
-  CryptoList: undefined;
+  FiatList: { type: string };
+  CryptoList: { type: string };
   // Add other screen names and their params as needed
 };
 

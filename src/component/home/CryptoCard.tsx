@@ -4,6 +4,7 @@ import { Text, Card, Avatar, ActivityIndicator } from 'react-native-paper';
 import { Wallet } from '../../type/wallet';
 import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
 import { getCurrencySymbol } from '../../utils/currency';
+import { socketBinance } from '../../socket';
 
 export interface PriceData {
   c: string;
@@ -22,24 +23,17 @@ const CryptoCard: React.FC<{ item: Wallet; navigation: any }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const ws = new WebSocket(
-      `wss://stream.binance.com:9443/ws/${item.currency.toLowerCase()}usdt@ticker`
-    );
+    socketBinance.on(`${item.currency.toLowerCase()}usdt/ticker`, (data) => {
+      setPriceData((prev) => {
+        setPrePriceData(prev);
+        setIsLoading(false);
+        return data;
+      });
+    });
 
-    ws.onmessage = (data) => {
-      if (data) {
-        const trade = JSON.parse(data.data);
-        setPriceData((prev) => {
-          setPrePriceData(prev);
-          setIsLoading(false); // Data received, set loading to false
-          return trade;
-        });
-      }
-    };
-
-    return () => {
-      ws.close();
-    };
+    // return () => {
+    //   socketBinance.disconnect();
+    // };
   }, [item.currency]);
 
   const priceChange = parseFloat(priceData.c) - parseFloat(prePriceData.c);

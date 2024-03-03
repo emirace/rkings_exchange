@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity } from 'react-native';
+import { View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import {
   ActivityIndicator,
   Appbar,
@@ -26,13 +26,14 @@ const products: ProductProps[] = [];
 
 const Store: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
   const { cart } = useCart();
-  const { products } = useProduct();
+  const { products, fetchProducts } = useProduct();
   const { setScrollY } = usePage();
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1); // Initial page
+  const [refreshing, setRefreshing] = useState(false);
 
   // const loadMoreData = () => {
   //   // Simulate fetching more data, replace with your actual logic
@@ -64,6 +65,12 @@ const Store: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
     // Update scrollY value in the context
     setScrollY(event.nativeEvent.contentOffset.y);
     console.log(event.nativeEvent.contentOffset.y);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProducts();
+    setRefreshing(false);
   };
 
   const headerComp = () => {
@@ -122,7 +129,11 @@ const Store: React.FC<HomeScreenNavigationProp> = ({ navigation, route }) => {
         // onEndReachedThreshold={0.1}
         ListHeaderComponent={headerComp}
         // ListFooterComponent={loading ? <ActivityIndicator animating /> : null}
-        style={{}}
+        // style={{ paddingBottom: 100, flex: 1 }}
+        ListFooterComponent={<View style={{ height: 120 }}></View>}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );

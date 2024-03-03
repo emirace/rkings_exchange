@@ -6,18 +6,19 @@ import { FiatListNavigationProp } from '../../type/navigation/topNav';
 import { Searchbar, Text } from 'react-native-paper';
 import { useWallet } from '../../context/WalletContext';
 
-const FiatListy: React.FC<FiatListNavigationProp> = ({ navigation, route }) => {
+const FiatList: React.FC<FiatListNavigationProp> = ({ navigation, route }) => {
+  const { type } = route.params;
   const { systemWallets } = useWallet();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState<Wallet[]>([]);
   const scrollY = new Animated.Value(0);
 
-  // Function to render each item in the FlatList
+  //  // Function to render each item in the FlatList
   const renderItem = ({ item }: { item: Wallet }) => (
     <CardListItem
       item={item}
       navigation={navigation}
-      screen="DepositFiatForm"
+      screen={type === 'Deposit' ? 'DepositFiatForm' : 'WithdrawalFiatForm'}
     />
   );
 
@@ -101,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FiatListy;
+export default FiatList;

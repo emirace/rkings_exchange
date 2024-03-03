@@ -7,10 +7,13 @@ export type RootStackParamList = {
   BuyForm: { currency: string };
   Sell: undefined;
   SellForm: { currency: string };
-  Deposit: undefined;
+  SelectCurrency: { type: 'Deposit' | 'Withdrawal' };
   DepositFiatForm: { currency: string };
   DepositCryptoForm: { currency: string };
   DepositAddress: undefined;
+  Withdrawal: undefined;
+  WithdrawalFiatForm: { currency: string };
+  WithdrawalCryptoForm: { currency: string };
   ProductDetail: { productId: string };
   Search: { query: string };
   Cart: undefined;
@@ -20,6 +23,8 @@ export type RootStackParamList = {
   Currency: undefined;
   Auth: undefined;
   Profile: undefined;
+  WithdrawalSuccess: undefined;
+  Transactions: undefined;
   // Add other screen names and their params as needed
 };
 
@@ -53,9 +58,9 @@ export type SellFormNavigationProp = NativeStackScreenProps<
   'SellForm'
 >;
 
-export type DepositNavigationProp = NativeStackScreenProps<
+export type SelectCurrencyNavigationProp = NativeStackScreenProps<
   RootStackParamList,
-  'Deposit'
+  'SelectCurrency'
 >;
 
 export type DepositFiatFormNavigationProp = NativeStackScreenProps<
@@ -66,6 +71,21 @@ export type DepositFiatFormNavigationProp = NativeStackScreenProps<
 export type DepositCryptoFormNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   'DepositCryptoForm'
+>;
+
+export type WithdrawalNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'Withdrawal'
+>;
+
+export type WithdrawalFiatFormNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'WithdrawalFiatForm'
+>;
+
+export type WithdrawalCryptoFormNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'WithdrawalCryptoForm'
 >;
 
 export type DepositAddressNavigationProp = NativeStackScreenProps<
@@ -116,4 +136,13 @@ export type AuthNavigationProp = NativeStackScreenProps<
 export type ProfileNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   'Profile'
+>;
+
+export type WithdrawalSuccessNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'WithdrawalSuccess'
+>;
+export type TransactionsNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'Transactions'
 >;

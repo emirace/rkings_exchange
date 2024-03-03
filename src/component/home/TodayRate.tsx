@@ -1,5 +1,5 @@
-import React, { ReactElement } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import React, { ReactElement, useState } from 'react';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import {
   Card,
   Avatar,
@@ -23,12 +23,21 @@ interface Props extends HomeScreenNavigationProp {
 
 const TodayRate: React.FC<Props> = ({ headerComp, navigation }) => {
   const { colors } = useTheme();
-  const { systemWallets, loading } = useWallet();
+  const { systemWallets, fetchSystemWallets, fetchWallets, loading } =
+    useWallet();
+  const [refreshing, setRefreshing] = useState(false);
 
   // Function to render each item in the flat list
   const renderItem = ({ item }: { item: Wallet }) => (
     <CryptoCard item={item} navigation={navigation} />
   );
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchSystemWallets();
+    await fetchWallets();
+    setRefreshing(false);
+  };
 
   const Hcomp = () => (
     <>
@@ -50,21 +59,16 @@ const TodayRate: React.FC<Props> = ({ headerComp, navigation }) => {
 
   return (
     <View style={styles.container}>
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      ) : (
-        <FlatList
-          data={systemWallets.filter((wal) => wal.type === 'Crypto')}
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={Hcomp}
-        />
-      )}
+      <FlatList
+        data={systemWallets.filter((wal) => wal.type === 'Crypto')}
+        keyExtractor={(item) => item._id}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={Hcomp}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
     </View>
   );
 };

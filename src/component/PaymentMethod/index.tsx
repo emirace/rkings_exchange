@@ -22,6 +22,7 @@ import {
   generateTransactionRef,
 } from '../../utils/helper';
 import List from './List';
+import { Currency } from 'flutterwave-react-native/dist/FlutterwaveInit';
 
 interface Props {
   amount: number;
@@ -163,7 +164,7 @@ const PaymentMethod: React.FC<Props> = ({
               email: 'customer-email@example.com',
             },
             amount,
-            currency: 'NGN',
+            currency: currency as Currency,
             payment_options: 'card',
           }}
           customButton={(props) => (

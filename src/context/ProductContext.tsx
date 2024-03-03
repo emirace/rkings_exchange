@@ -16,7 +16,7 @@ import {
 import { ProductProps } from '../type/product';
 import useAuth from './AuthContext';
 import { getBackendErrorMessage } from '../utils/error';
-import { convertCurrency, getConversionRate } from '../utils/currency';
+import { convertCurrency } from '../utils/currency';
 import { useWallet } from './WalletContext';
 
 interface Props {
@@ -32,6 +32,7 @@ export const ProductContext = createContext<
       fetchProductById: (productId: string) => Promise<ProductProps>;
       updateProduct: (product: ProductProps) => Promise<boolean>;
       createProduct: (product: ProductProps) => Promise<boolean>;
+      fetchProducts: () => void;
       deleteProduct: (productId: string) => Promise<boolean>;
     }
   | undefined
@@ -144,6 +145,7 @@ export const ProductProvider: React.FC<Props> = ({ children }) => {
           product.currency,
           baseCurrency?.currency
         );
+        console.log(product);
         return product;
       })
     );
@@ -151,18 +153,21 @@ export const ProductProvider: React.FC<Props> = ({ children }) => {
     setProducts(updatedProducts);
   };
 
-  useEffect(() => {
+  const fetchProducts = async () => {
     setError('');
-    fetchProductsService()
-      .then((data) => {
-        setProducts(data);
-        updateProducts(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        handleError(getBackendErrorMessage(error));
-      });
+    try {
+      const data = await fetchProductsService();
+      setProducts(data);
+      updateProducts(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      handleError(getBackendErrorMessage(error));
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -179,6 +184,7 @@ export const ProductProvider: React.FC<Props> = ({ children }) => {
         createProduct,
         updateProduct,
         deleteProduct,
+        fetchProducts,
       }}
     >
       {children}

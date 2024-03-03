@@ -10,12 +10,15 @@ import {
   Text,
 } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
-import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
-import { DepositAddressNavigationProp } from '../../type/navigation/stackNav';
-import { useDeposit } from '../../context/DepositContext';
+import {
+  getResponsiveFontSize,
+  getResponsiveHeight,
+} from '../../../utils/size';
+import { DepositAddressNavigationProp } from '../../../type/navigation/stackNav';
+import { useDeposit } from '../../../context/DepositContext';
 import * as Clipboard from 'expo-clipboard';
 
-const DepositAddress: React.FC<DepositAddressNavigationProp> = ({
+const WithdrawalAddress: React.FC<DepositAddressNavigationProp> = ({
   navigation,
 }) => {
   const { wallet } = useDeposit();
@@ -150,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DepositAddress;
+export default WithdrawalAddress;

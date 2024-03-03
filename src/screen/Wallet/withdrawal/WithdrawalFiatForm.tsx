@@ -13,22 +13,29 @@ import {
   Checkbox,
   RadioButton,
 } from 'react-native-paper';
-import { Wallet } from '../../type/wallet';
-import List from '../../component/exchange/List';
-import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
-import CustomKeyboard from '../../component/CustomKeyboard';
+import { Wallet } from '../../../type/wallet';
+import List from '../../../component/exchange/List';
+import {
+  getResponsiveFontSize,
+  getResponsiveHeight,
+} from '../../../utils/size';
+import CustomKeyboard from '../../../component/CustomKeyboard';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { getCurrencySymbol } from '../../utils/currency';
-import PaymentMethod from '../../component/PaymentMethod';
-import { DepositFiatFormNavigationProp } from '../../type/navigation/stackNav';
-import { useWallet } from '../../context/WalletContext';
+import { getCurrencySymbol } from '../../../utils/currency';
+import PaymentMethod from '../../../component/PaymentMethod';
+import { WithdrawalFiatFormNavigationProp } from '../../../type/navigation/stackNav';
+import { useWallet } from '../../../context/WalletContext';
+import { baseURL } from '../../../services/api';
+import WithdrawalMethod from '../../../component/WithdrawMethod';
+import { formatNumberWithCommasAndDecimals } from '../../../utils/helper';
 
-const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
+const WithdrawalFiatForm: React.FC<WithdrawalFiatFormNavigationProp> = ({
   navigation,
   route,
 }) => {
   const _goBack = () => navigation.goBack();
   const { systemWallets, depositWallet } = useWallet();
+  const { wallets } = useWallet();
 
   const currency = route.params.currency;
   const { colors } = useTheme();
@@ -111,6 +118,8 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
     }
   };
 
+  const userwallet = wallets.find((wal) => wal.currency === currency);
+
   return loading ? (
     <ActivityIndicator animating={true} />
   ) : !wallet ? (
@@ -127,6 +136,7 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
           justifyContent: 'space-between',
           flex: 1,
           padding: getResponsiveHeight(20),
+          paddingBottom: getResponsiveFontSize(30),
         }}
       >
         <View>
@@ -139,14 +149,14 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
             }}
           >
             <Avatar.Image
-              source={{ uri: wallet.image }}
+              source={{ uri: baseURL + wallet.image }}
               size={getResponsiveHeight(20)}
             />
             <Text
               variant="titleLarge"
               style={{ fontWeight: '600', fontSize: getResponsiveFontSize(22) }}
             >
-              Deposit {currency}
+              Withdraw {currency}
             </Text>
           </View>
           <View
@@ -155,6 +165,10 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
             }}
           >
             <Text variant="labelLarge">Enter amount</Text>
+            <Text>
+              {getCurrencySymbol(currency)}
+              {formatNumberWithCommasAndDecimals(userwallet!.balance)}
+            </Text>
           </View>
 
           <View
@@ -215,15 +229,14 @@ const DepositFiatForm: React.FC<DepositFiatFormNavigationProp> = ({
           backgroundColor: colors.primary,
         }}
       >
-        <PaymentMethod
+        <WithdrawalMethod
           amount={parseFloat(text)}
-          currency={currency}
-          onApprove={onApprove}
-          methods={['card']}
+          currency="NGN"
+          navigation={navigation}
         />
       </BottomSheetModal>
     </View>
   );
 };
 
-export default DepositFiatForm;
+export default WithdrawalFiatForm;

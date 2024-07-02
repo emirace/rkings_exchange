@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "rkings-420800",
+  "private_key_id": "450dc2fe46b1b9faf19199166a2447c28ea68e51",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDqwz2TqCEX33UP\nmN6Gy9QkGD4D3RLZDUIwomtL9hNxYUerTx8AlPbCyukqhnAeAWVJ68KIS0SAcNj4\na7iYpFp4AtTO9JXmZ/WNnGmb3uerLGzO03R/rgeQo2x0QQeaA7A9c0wseTjL6Szb\nYi6saNdek5tFR2u5rsZbE8x9pyAcor562yOgdGalz5RL8kNDivqtz5QNAcjBocCJ\nkMPFwWmXtaidu4Il4M34BJApKHcqDcq4vNrQYsW1d/D+zkzSG2FhUIP1SOaITYAo\noR0JsK/olXCgIC2qYdvXENv+kh3uEZ1lBubYdQtRU/WXLILSoCPe6rPfEpzzSISu\n3/NQw+HNAgMBAAECggEAKEBpDKnhYLM84jt6/gAxQ64PZgCv9Fy4Wlfizz+mJkTA\ncdArV+FyrMP3NgYeb5qcKBA/BrjnCiGvJersV+moJFcR71kS4ZI2ET1+Aw51SM1h\na5XobeLkI6nNlOI4gDD9NRARgbeYJCg6+3OKXp/MO4hR8U81Wn0rv951a57t29K8\nhdaOvNr55tXBJy7OdkpwcXGmXzqQqla3niWqoWY8Y1f7Nn2zi/+dorHkY5e5tlv+\nmxkwqCm5NIxN7XtZgrGRhSthmYotE7kB4j3iZROp1TidzAqW2aETuovWBCao1IO7\n9vtk+Xi45o/t03hY6f53D5TC1177rHi1sDgTAnS02QKBgQD3B8EqZpdw1FeVPoUj\nQC0kji2ZSt3SEfHB944xT58GbLjcqFwese9k3sAA9gZO7SMsssikwKbmN79KQotu\nG8YT5IeSNqC3+Q65Ev4tOnYs49eoFzcq9WqxlRmxRKz8qc2+WVVso3Tkulj8chJ8\nwRp0OnpJ4LPdtUl9v6KtWprSiQKBgQDzSXQTfwC3jur2UpDoPVmX8/2uzf0fPy9d\ntP3bBCPWwhya9zEDmlPfevVDa5ATQ8w4fc4rj+eVgrAI0BBuEFDvW0kiemOR7tUf\nNmcfykK7i1RXIE0/9rkKbYkL+0sn1d2rgcn7Fw3qCgG/cfQ/WNQBSC+WqUPJ7CW9\n+zMnFzrUJQKBgQDrzS0oKjHY8/h+b+VqlrIAuO7x6rL++T4KZyIGE/i6i0GS7+qv\nKi5X3QDuaenvoRD4c9hu2671BrXETu0FN+HFz1lRym9z7XuOUoDp72oqw3px62cv\nzIAB709NFT8DF5tbXa7bOtQ0GWUj5Eedaj60P7XHm4RV19zE+g5w55Ht8QKBgEIv\nWHG5WlOVgNxUJ/HWRtps2TXF+jeW8+bVRz5fCPTyx99sohvtzyV8CN83kvF6v0Mb\nDoyRUJo+/G7ZU67tp2cGeYX0r8PSqo4cOb/PQYpN5DrzobBmCX8Jv3/P9Gk46F4x\nJ+a0JefmowUXFjBplPtoTPH6yGNVaAsgHJFk4281AoGAFPOVdPgJUKSmPm63cJej\nnmsaQJYAt6NsFuZr2XZoOTCe9XFhWoDjT8fv2Jpwv5RXZ8a/0gBfrYjphbZq3bSy\nN/Zlh1El0U+8Z+79z0fTJQYkN9LmfyNzCffPNvLJHHkanGGOX7F3dWeiyaqtZmeD\nC6eCjirs9DznsXSjzxB57Pc=\n-----END PRIVATE KEY-----\n",
+  "client_email": "emirace-service-account@rkings-420800.iam.gserviceaccount.com",
+  "client_id": "114580668413369627349",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/emirace-service-account%40rkings-420800.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

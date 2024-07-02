@@ -68,7 +68,7 @@ const Transactions: React.FC<TransactionsNavigationProp> = ({ navigation }) => {
           <View>
             <Text style={{ fontWeight: '600', marginBottom: 5, fontSize: 18 }}>
               {getCurrencySymbol(item.currency)}
-              {formatNumberWithCommasAndDecimals(item.amount, 4)}
+              {formatNumberWithCommasAndDecimals(item.amount)}
             </Text>
             <Text
               style={{

@@ -34,6 +34,7 @@ import List from '../../component/exchange/List';
 import CustomBackdrop from '../../component/CustomBackdrop';
 import LoginModal from '../../component/auth/LoginModal';
 import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
+import AddWallet from '../../component/AddWallet';
 
 const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
   const {
@@ -56,7 +57,7 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
     }
   };
 
-  const handleWalletCreate = () => {
+  const closeSheet = () => {
     bottomSheetModalRef.current?.dismiss();
   };
 
@@ -238,7 +239,7 @@ const Wallet: React.FC<HomeScreenNavigationProp> = ({ navigation }) => {
         }}
         backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
-        <List onSelect={handleWalletCreate} />
+        <AddWallet closeSheet={closeSheet} />
       </BottomSheetModal>
     </View>
   );

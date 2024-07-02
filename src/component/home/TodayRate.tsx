@@ -68,6 +68,7 @@ const TodayRate: React.FC<Props> = ({ headerComp, navigation }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        ListFooterComponent={<View style={{ height: 120 }}></View>}
       />
     </View>
   );

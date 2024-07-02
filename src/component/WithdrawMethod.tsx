@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useVerification } from '../context/VerificationContext';
-import { Text, Button } from 'react-native-paper'; // Assuming you have a Paper component for buttons
+import { Text, Button, Modal, Icon, useTheme } from 'react-native-paper'; // Assuming you have a Paper component for buttons
 import { getCurrencySymbol } from '../utils/currency';
 import { formatNumberWithCommasAndDecimals } from '../utils/helper';
 import {
@@ -10,21 +10,27 @@ import {
   getResponsiveWidth,
 } from '../utils/size';
 import { useWithdraw } from '../context/WithdrawContext';
+import { useWallet } from '../context/WalletContext';
 
 interface Props {
   amount: number;
   currency: string;
   navigation: any;
+  closeModal: () => void;
 }
 
 const WithdrawalMethod: React.FC<Props> = ({
   amount,
   currency,
   navigation,
+  closeModal,
 }) => {
   const { verifications } = useVerification();
-  const { createWithdrawalRequest } = useWithdraw();
+  const { fetchWallets } = useWallet();
+  const { createWithdrawalRequest, error } = useWithdraw();
+  const { colors } = useTheme();
   const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = React.useState(false);
 
   const verification = verifications.find((ver) => ver.name === 'account');
 
@@ -32,10 +38,16 @@ const WithdrawalMethod: React.FC<Props> = ({
     setLoading(true);
     const result = await createWithdrawalRequest(currency, amount);
     if (result) {
-      navigation.navigate('WithdrawalSuccess');
+      closeModal();
+      fetchWallets();
+      navigation.replace('WithdrawalSuccess');
+    } else {
+      setVisible(true);
     }
     setLoading(false);
   };
+
+  const hideModal = () => setVisible(false);
 
   return (
     <View style={styles.container}>
@@ -84,6 +96,44 @@ const WithdrawalMethod: React.FC<Props> = ({
       >
         Exchange
       </Button>
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={[
+          {
+            backgroundColor: colors.background,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+            margin: 20,
+            borderRadius: 10,
+          },
+        ]}
+      >
+        <Icon source={'message-alert'} size={50} color={colors.primary} />
+        <Text
+          style={{
+            fontWeight: '600',
+            fontSize: getResponsiveFontSize(30),
+            marginBottom: getResponsiveHeight(20),
+          }}
+        >
+          Transaction failed
+        </Text>
+        <Text>{error}</Text>
+        <Button
+          mode="contained"
+          labelStyle={{
+            fontWeight: '800',
+          }}
+          uppercase
+          style={{ borderRadius: 5, marginTop: getResponsiveHeight(20) }}
+          onPress={() => setVisible(false)}
+          contentStyle={{ height: getResponsiveHeight(60) }}
+        >
+          Try again
+        </Button>
+      </Modal>
     </View>
   );
 };

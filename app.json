@@ -2,7 +2,7 @@
   "expo": {
     "name": "rkings_exchange",
     "slug": "rkings_exchange",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -14,7 +14,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "userInterfaceStyle": "automatic"
+      "userInterfaceStyle": "automatic",
+      "bundleIdentifier": "rkingsexchange"
     },
     "android": {
       "userInterfaceStyle": "automatic",
@@ -22,7 +23,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.emirace.rkings_exchange"
+      "package": "com.emirace.rkings_exchange",
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,6 +41,12 @@
           "photosPermission": "Rkings Exchange would like to accesses your photos ."
         }
       ]
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/70f07912-5356-4b12-879b-d06faeed3ebf"
+    }
   }
 }

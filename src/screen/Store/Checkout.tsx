@@ -1,6 +1,14 @@
 import { View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { Appbar, Icon, List, Text, useTheme } from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Appbar,
+  Icon,
+  List,
+  Modal,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import { CheckoutNavigationProp } from '../../type/navigation/stackNav';
 import PaymentMethod from '../../component/PaymentMethod';
 import {
@@ -15,14 +23,17 @@ import { useOrder } from '../../context/OrderContext';
 import useCart from '../../context/CartContext';
 import { useWallet } from '../../context/WalletContext';
 import LoginModal from '../../component/auth/LoginModal';
+import { Order } from '../../type/order';
 
 const Checkout: React.FC<CheckoutNavigationProp> = ({ navigation }) => {
   const { colors } = useTheme();
-  const { total } = useCart();
+  const { total, cart, clearCart } = useCart();
   const { baseCurrency } = useWallet();
-  const { shippingInfo } = useOrder();
+  const { shippingInfo, createOrder, createOrderWallet } = useOrder();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isShipping, setIsShipping] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [order, setOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     if (
@@ -43,7 +54,37 @@ const Checkout: React.FC<CheckoutNavigationProp> = ({ navigation }) => {
       bottomSheetModalRef.current.present();
     }
   };
-  const onApprove = () => {};
+
+  const onApprove = async (ref: number, provider: string, method?: string) => {
+    setLoading(true);
+    var result;
+    if (method === 'card') {
+      result = await createOrder({
+        products: cart,
+        totalPrice: total,
+        shippingAddress: {},
+        paymentMethod: method,
+        paymentProvider: provider,
+        transactionId: ref,
+      });
+    } else {
+      result = await createOrderWallet({
+        products: cart,
+        totalPrice: total,
+        shippingAddress: {},
+        paymentMethod: 'wallet',
+        currency: baseCurrency.currency,
+      });
+    }
+    if (result.status) {
+      setOrder(result.order);
+      clearCart();
+      navigation.replace('Search', { query: '' });
+    } else {
+    }
+    setLoading(true);
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Appbar.Header style={{ marginBottom: getResponsiveHeight(20) }}>
@@ -180,6 +221,9 @@ const Checkout: React.FC<CheckoutNavigationProp> = ({ navigation }) => {
         )}
       </View>
       <LoginModal navigation={navigation} />
+      <Modal visible={loading} dismissable={false}>
+        <ActivityIndicator />
+      </Modal>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}

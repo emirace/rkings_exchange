@@ -25,6 +25,7 @@ import { ExchangeNavigationProp } from '../type/navigation/stackNav';
 import { getConversionRate, getCurrencySymbol } from '../utils/currency';
 import { useWallet } from '../context/WalletContext';
 import { formatNumberWithCommasAndDecimals } from '../utils/helper';
+import LoginModal from '../component/auth/LoginModal';
 
 const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
   const {
@@ -255,8 +256,7 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
                   {getCurrencySymbol(selectedWalletTo.currency)}
                   {swapAmount
                     ? formatNumberWithCommasAndDecimals(
-                        exchange * parseFloat(swapAmount),
-                        selectedWalletTo.type === 'Crypto' ? 9 : 2
+                        exchange * parseFloat(swapAmount)
                       )
                     : ''}
                 </Text>
@@ -271,10 +271,7 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
                   {exchangeLoading ? (
                     <ActivityIndicator size={10} />
                   ) : (
-                    formatNumberWithCommasAndDecimals(
-                      exchange,
-                      selectedWalletTo.type === 'Crypto' ? 9 : 2
-                    )
+                    formatNumberWithCommasAndDecimals(exchange)
                   )}{' '}
                   to {getCurrencySymbol(selectedWalletFrom.currency)}
                 </Text>
@@ -309,6 +306,8 @@ const Exchange: React.FC<ExchangeNavigationProp> = ({ navigation }) => {
           </Button>
         </View>
       </View>
+
+      <LoginModal navigation={navigation} />
 
       <Modal
         visible={visible}

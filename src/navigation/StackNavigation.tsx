@@ -24,6 +24,7 @@ import WithdrawalCryptoForm from '../screen/Wallet/withdrawal/WithdrawalCryptoFo
 import SelectCurrency from '../screen/Wallet/SelectCurrency';
 import WithdrawalSuccess from '../screen/Wallet/withdrawal/WithdrawalSuccess';
 import Transactions from '../screen/Transactions';
+import WithdrawalAddress from '../screen/Wallet/withdrawal/WithdrawalAddress';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -91,6 +92,12 @@ function MainStackNav() {
         <Stack.Screen
           name="DepositAddress"
           component={DepositAddress}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="WithdrawalAddress"
+          component={WithdrawalAddress}
           options={{ headerShown: false }}
         />
 

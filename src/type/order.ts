@@ -8,7 +8,7 @@ export interface IOrderData {
   paymentMethod: string;
   paymentProvider?: string;
   transactionId?: number;
-  currency?: Currency;
+  currency?: Currency | string;
 }
 
 export interface Order {

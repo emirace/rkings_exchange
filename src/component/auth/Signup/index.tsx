@@ -12,17 +12,23 @@ import {
   getResponsiveFontSize,
   getResponsiveHeight,
   getResponsiveWidth,
-} from '../../utils/size';
-import useAuth from '../../context/AuthContext';
+} from '../../../utils/size';
+import useAuth from '../../../context/AuthContext';
 import { useBottomSheetInternal } from '@gorhom/bottom-sheet';
 
-const SignUp: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
-  const { sendVerifyEmail, loading, error: signInError } = useAuth();
+interface Props {
+  gotoLogin: () => void;
+  gotoToken: () => void;
+  email: string;
+  setEmail: (value: string) => void;
+}
+
+const SignUp: React.FC<Props> = ({ gotoLogin, gotoToken, email, setEmail }) => {
+  const { sendVerifyOtp, error: signInError } = useAuth();
   const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
-  const [resetSuccess, setResetSuccess] = useState(false);
   const { colors } = useTheme();
-  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -45,12 +51,14 @@ const SignUp: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
     } else if (!isValidEmail(email)) {
       setError('Please enter a valid email address.');
     } else {
-      const result = await sendVerifyEmail({ email });
+      setLoading(true);
+      const result = await sendVerifyOtp({ email });
       if (result) {
-        setResetSuccess(true);
+        gotoToken();
       } else {
         setError(signInError || '');
       }
+      setLoading(false);
     }
   };
 
@@ -60,7 +68,7 @@ const SignUp: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
     return emailRegex.test(email);
   };
 
-  return !resetSuccess ? (
+  return (
     <View style={styles.container}>
       <Text style={styles.header}>Sign Up</Text>
       <Text style={styles.description}>Enter your email to sign up.</Text>
@@ -115,24 +123,6 @@ const SignUp: React.FC<{ gotoLogin: () => void }> = ({ gotoLogin }) => {
           style={styles.socialIcon}
         />
       </View>
-    </View>
-  ) : (
-    <View
-      style={{
-        alignItems: 'center',
-        marginTop: getResponsiveHeight(40),
-        flex: 1,
-        paddingHorizontal: getResponsiveWidth(20),
-      }}
-    >
-      <Icon source={'check-circle'} size={50} color={colors.primary} />
-      <Text style={{ fontSize: getResponsiveFontSize(30), fontWeight: '600' }}>
-        Email sent successfully
-      </Text>
-      <Text style={styles.successText}>
-        Password reset email sent successfully. Check your email for further
-        instructions.
-      </Text>
     </View>
   );
 };

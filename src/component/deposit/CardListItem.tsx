@@ -13,6 +13,7 @@ interface Props {
 
 const CardListItem: React.FC<Props> = ({ navigation, item, screen }) => {
   const handleClick = (value: Wallet) => {
+    console.log(screen);
     navigation.navigate(screen, { currency: value.currency });
   };
 

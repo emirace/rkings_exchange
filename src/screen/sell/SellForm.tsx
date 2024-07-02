@@ -23,6 +23,8 @@ import { getConversionRate, getCurrencySymbol } from '../../utils/currency';
 import { useWithdraw } from '../../context/WithdrawContext';
 import { baseURL } from '../../services/api';
 import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
+import LoginModal from '../../component/auth/LoginModal';
+import WithdrawalMethod from '../../component/WithdrawMethod';
 
 const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
   const { systemWallets, baseCurrency, fetchWallets } = useWallet();
@@ -46,10 +48,17 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
   const [status, setStatus] = useState(false);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const bottomSheetModalRef2 = useRef<BottomSheetModal>(null);
 
   const openBottomSheet = () => {
     if (bottomSheetModalRef.current) {
       bottomSheetModalRef.current.present();
+    }
+  };
+
+  const openBottomSheet2 = () => {
+    if (bottomSheetModalRef2.current) {
+      bottomSheetModalRef2.current.present();
     }
   };
 
@@ -116,8 +125,6 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
     getExchange();
   }, [currency, paymentWallet, showQuantity]);
 
-  const hideModal = () => setVisible(false);
-
   const handleWalletChange = (item: Wallet) => {
     setPaymentWallet(item);
     setshowQuantity(false);
@@ -133,7 +140,6 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
       fetchWallets();
       setStatus(true);
     } else {
-      setVisible(true);
     }
   };
 
@@ -248,7 +254,7 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
             {exchangeLoading ? (
               <ActivityIndicator size={10} />
             ) : (
-              formatNumberWithCommasAndDecimals(exchange, 9)
+              formatNumberWithCommasAndDecimals(exchange)
             )}{' '}
             to{' '}
             {getCurrencySymbol(
@@ -267,7 +273,7 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
             }}
             uppercase
             style={{ borderRadius: 5 }}
-            onPress={onApprove}
+            onPress={openBottomSheet2}
             contentStyle={{ height: getResponsiveHeight(50) }}
             loading={loadingWithdraw}
           >
@@ -275,45 +281,8 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
           </Button>
         </View>
       </View>
+      <LoginModal navigation={navigation} />
 
-      <Modal
-        visible={visible}
-        onDismiss={hideModal}
-        contentContainerStyle={[
-          {
-            backgroundColor: colors.background,
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-            margin: 20,
-            borderRadius: 10,
-          },
-        ]}
-      >
-        <Icon source={'message-alert'} size={50} color={colors.primary} />
-        <Text
-          style={{
-            fontWeight: '600',
-            fontSize: getResponsiveFontSize(30),
-            marginBottom: getResponsiveHeight(20),
-          }}
-        >
-          Transaction failed
-        </Text>
-        <Text>{error}</Text>
-        <Button
-          mode="contained"
-          labelStyle={{
-            fontWeight: '800',
-          }}
-          uppercase
-          style={{ borderRadius: 5, marginTop: getResponsiveHeight(20) }}
-          onPress={() => setVisible(false)}
-          contentStyle={{ height: getResponsiveHeight(60) }}
-        >
-          Try again
-        </Button>
-      </Modal>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -327,6 +296,24 @@ const SellForm: React.FC<SellFormNavigationProp> = ({ navigation, route }) => {
         }}
       >
         <List onSelect={handleWalletChange} type="Fiat" />
+      </BottomSheetModal>
+      <BottomSheetModal
+        ref={bottomSheetModalRef2}
+        index={0}
+        snapPoints={['50%']}
+        backgroundStyle={{
+          backgroundColor: colors.elevation.level1,
+        }}
+        handleIndicatorStyle={{
+          backgroundColor: colors.primary,
+        }}
+      >
+        <WithdrawalMethod
+          amount={parseFloat(text)}
+          currency={paymentWallet.currency}
+          closeModal={() => bottomSheetModalRef2.current?.close()}
+          navigation={navigation}
+        />
       </BottomSheetModal>
     </View>
   );

@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import {
   createSystemWalletService,
+  createUserWalletService,
   deleteSystemWalletService,
   depositWalletService,
   fetchSystemWalletsService,
@@ -48,6 +49,10 @@ interface WalletContextData {
   createSystemWallet: (walletData: SystemWalletData) => Promise<boolean>;
   isVisible: boolean;
   updateIsVisible: (value: boolean) => void;
+  createUserWallet: (walletData: {
+    name: string;
+    network?: string;
+  }) => Promise<boolean>;
 }
 
 export const WalletContext = createContext<WalletContextData | undefined>(
@@ -139,6 +144,26 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
     (total, wallet) => total + wallet.convertedBalance,
     0
   );
+
+  const createUserWallet = async (walletData: {
+    name: string;
+    network?: string;
+  }) => {
+    try {
+      setLoading(true);
+      const result = await createUserWalletService(walletData);
+      setWallets((prevWallets) => {
+        const updatedWallets = [result, ...prevWallets];
+        return updatedWallets;
+      });
+      setLoading(false);
+      return true;
+    } catch (error) {
+      handleError(error as string);
+      setLoading(false);
+      return false;
+    }
+  };
 
   const fetchWallets = async () => {
     try {
@@ -239,7 +264,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
         transactionId,
         currency
       );
-      console.log(result);
+      console.log('hello', result);
       if (result.status) {
         fetchWallets();
       }
@@ -324,6 +349,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({
         fetchSystemWallets,
         depositWallet,
         sendCrypto,
+        createUserWallet,
       }}
     >
       {children}

@@ -85,6 +85,21 @@ export const depositWalletService = async (
   }
 };
 
+export const createUserWalletService = async (walletData: {
+  name: string;
+  network?: string;
+}) => {
+  try {
+    const response: any = await api.post(`/wallets/user`, walletData);
+    const wallet = response.wallet;
+    return wallet;
+  } catch (error) {
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(`Error creating wallet `, errorMessage);
+    throw errorMessage;
+  }
+};
+
 export const transferFundsService = async (
   fromCurrency: string,
   toCurrency: string,

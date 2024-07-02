@@ -122,12 +122,28 @@ const CartScreen: React.FC<CartNavigationProp> = ({ navigation }) => {
           onPress={clearCart}
         />
       </Appbar.Header>
-      <FlatList
-        data={cart}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.container}
-      />
+      {cart.length < 1 ? (
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text style={{ fontWeight: 'bold' }}>
+            Cart is Empty.{' '}
+            <Text
+              style={{ color: colors.primary, fontWeight: '800' }}
+              onPress={() => navigation.push('Search', { query: '' })}
+            >
+              Start shopping
+            </Text>
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={cart}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={styles.container}
+        />
+      )}
       <View style={{ padding: getResponsiveHeight(20) }}>
         <View
           style={{

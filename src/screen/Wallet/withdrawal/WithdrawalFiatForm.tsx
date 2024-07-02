@@ -165,10 +165,15 @@ const WithdrawalFiatForm: React.FC<WithdrawalFiatFormNavigationProp> = ({
             }}
           >
             <Text variant="labelLarge">Enter amount</Text>
-            <Text>
-              {getCurrencySymbol(currency)}
-              {formatNumberWithCommasAndDecimals(userwallet!.balance)}
-            </Text>
+            <View
+              style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}
+            >
+              <Text>Bal:</Text>
+              <Text>
+                {getCurrencySymbol(currency)}
+                {formatNumberWithCommasAndDecimals(userwallet!.balance)}
+              </Text>
+            </View>
           </View>
 
           <View
@@ -232,6 +237,7 @@ const WithdrawalFiatForm: React.FC<WithdrawalFiatFormNavigationProp> = ({
         <WithdrawalMethod
           amount={parseFloat(text)}
           currency="NGN"
+          closeModal={() => bottomSheetModalRef.current?.close()}
           navigation={navigation}
         />
       </BottomSheetModal>

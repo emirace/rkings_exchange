@@ -1,6 +1,17 @@
 import { View, Image, ScrollView, StyleSheet } from 'react-native';
-import React, { useRef } from 'react';
-import { Appbar, Chip, FAB, Icon, Text, useTheme } from 'react-native-paper';
+import React, { useRef, useState } from 'react';
+import {
+  Appbar,
+  Button,
+  Chip,
+  Dialog,
+  Divider,
+  FAB,
+  Icon,
+  List,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import { ProfileNavigationProp } from '../type/navigation/stackNav';
 import { baseURL } from '../services/api';
 import {
@@ -16,14 +27,31 @@ import CustomBackdrop from '../component/CustomBackdrop';
 import EditProfileForm from '../component/EditProfileForm';
 
 const Profile: React.FC<ProfileNavigationProp> = ({ navigation }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { colors } = useTheme();
+  const [visible, setVisible] = useState(false);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const openBottomSheet = () => {
     if (bottomSheetModalRef.current) {
       bottomSheetModalRef.current.present();
     }
+  };
+
+  const close = () => {
+    if (bottomSheetModalRef.current) {
+      bottomSheetModalRef.current.dismiss();
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    onDismiss();
+    navigation.navigate('HomeMain');
+  };
+
+  const onDismiss = () => {
+    setVisible(false);
   };
 
   return (
@@ -95,67 +123,86 @@ const Profile: React.FC<ProfileNavigationProp> = ({ navigation }) => {
               Join {moment(user?.createdAt).fromNow()}
             </Chip>
           </View>
-          <View style={{ marginBottom: getResponsiveHeight(20) }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-                marginBottom: getResponsiveHeight(10),
-              }}
-            >
-              <Icon size={20} source="email" />
-              <Text style={styles.label}>Email</Text>
+          <Text style={styles.title}>Personal Info</Text>
+          <View
+            style={[
+              styles.infoCont,
+              { backgroundColor: colors.elevation.level4 },
+            ]}
+          >
+            <View style={styles.rowCont}>
+              <View style={styles.labelcont}>
+                <Icon size={20} source="email" />
+                <Text style={styles.label}>Email</Text>
+              </View>
+              <Text style={styles.value}>{user?.email || 'nil'}</Text>
             </View>
-            <Text style={styles.value}>{user?.email || 'nil'}</Text>
-          </View>
-          <View style={{ marginBottom: getResponsiveHeight(20) }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-                marginBottom: getResponsiveHeight(10),
-              }}
-            >
-              <Icon size={20} source="phone" />
-              <Text style={styles.label}>Phone</Text>
+            <Divider
+              style={{ backgroundColor: colors.background, height: 2 }}
+            />
+            <View style={styles.rowCont}>
+              <View style={styles.labelcont}>
+                <Icon size={20} source="phone" />
+                <Text style={styles.label}>Phone</Text>
+              </View>
+              <Text style={styles.value}>{user?.phone || 'nil'}</Text>
             </View>
-            <Text style={styles.value}>{user?.phone || 'nil'}</Text>
-          </View>
 
-          <View style={{ marginBottom: getResponsiveHeight(20) }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-                marginBottom: getResponsiveHeight(10),
-              }}
-            >
-              <Icon size={20} source="email" />
-              <Text style={styles.label}>Date of Birth</Text>
+            <Divider
+              style={{ backgroundColor: colors.background, height: 2 }}
+            />
+            <View style={styles.rowCont}>
+              <View style={styles.labelcont}>
+                <Icon size={20} source="email" />
+                <Text style={styles.label}>Date of Birth</Text>
+              </View>
+              <Text style={styles.value}>
+                {moment(user?.dateOfBirth).format('ddd DD  MMMM YYYY') || 'nil'}
+              </Text>
             </View>
-            <Text style={styles.value}>{user?.dateOfBirth || 'nil'}</Text>
-          </View>
 
-          <View style={{ marginBottom: getResponsiveHeight(20) }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-                marginBottom: getResponsiveHeight(10),
-              }}
-            >
-              <Icon size={20} source="text-account" />
-              <Text style={styles.label}>About Me</Text>
+            <Divider
+              style={{ backgroundColor: colors.background, height: 2 }}
+            />
+            <View style={styles.rowCont}>
+              <View style={styles.labelcont}>
+                <Icon size={20} source="text-account" />
+                <Text style={styles.label}>About Me</Text>
+              </View>
+              <Text style={styles.value}>{user?.bio || 'nil'}</Text>
             </View>
-            <Text style={styles.value}>{user?.bio || 'nil'}</Text>
+          </View>
+          <View style={{ marginTop: getResponsiveHeight(20) }}>
+            <Text style={styles.title}>Utilities</Text>
+            {user && (
+              <List.Item
+                title="Log out"
+                titleStyle={{
+                  fontSize: getResponsiveFontSize(22),
+                }}
+                left={() => <List.Icon icon="logout" />}
+                onPress={() => setVisible(true)}
+                style={{
+                  backgroundColor: colors.elevation.level5,
+                  borderRadius: 10,
+                  paddingHorizontal: getResponsiveWidth(20),
+                }}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
 
+      <Dialog visible={visible} onDismiss={onDismiss}>
+        <Dialog.Title>Logout</Dialog.Title>
+        <Dialog.Content>
+          <Text>Are you sure you want to logout?</Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={onDismiss}>Cancel</Button>
+          <Button onPress={handleLogout}>Logout</Button>
+        </Dialog.Actions>
+      </Dialog>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -169,7 +216,7 @@ const Profile: React.FC<ProfileNavigationProp> = ({ navigation }) => {
         }}
         backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
-        <EditProfileForm />
+        <EditProfileForm close={close} />
       </BottomSheetModal>
     </View>
   );
@@ -196,7 +243,7 @@ const styles = StyleSheet.create({
   },
   contentbody: {
     marginTop: getResponsiveHeight(280),
-    padding: getResponsiveHeight(40),
+    padding: getResponsiveHeight(20),
   },
   name: {
     fontSize: getResponsiveFontSize(32),
@@ -213,11 +260,28 @@ const styles = StyleSheet.create({
     top: 0,
     height: '100%',
   },
-  value: { opacity: 0.5, fontSize: getResponsiveFontSize(28) },
+  title: {
+    fontSize: getResponsiveFontSize(20),
+    fontWeight: '600',
+    marginBottom: getResponsiveHeight(5),
+  },
+  rowCont: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: getResponsiveHeight(20),
+  },
+  value: { opacity: 0.5, fontSize: getResponsiveFontSize(20) },
+  labelcont: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
   label: {
-    fontSize: getResponsiveFontSize(28),
+    fontSize: getResponsiveFontSize(20),
     fontWeight: '600',
   },
+  infoCont: { borderRadius: 15 },
 });
 
 export default Profile;

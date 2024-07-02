@@ -8,6 +8,7 @@ import {
   IconButton,
   Snackbar,
   Text,
+  useTheme,
 } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 import {
@@ -17,32 +18,44 @@ import {
 import { DepositAddressNavigationProp } from '../../../type/navigation/stackNav';
 import { useDeposit } from '../../../context/DepositContext';
 import * as Clipboard from 'expo-clipboard';
+import { useAddress } from '../../../context/AddressContext';
+import { IAddress } from '../../../type/address';
 
 const DepositAddress: React.FC<DepositAddressNavigationProp> = ({
   navigation,
 }) => {
-  const { wallet } = useDeposit();
+  const { wallet, network } = useDeposit();
+  const { createAddress } = useAddress();
+  const { colors } = useTheme();
   const _goBack = () => navigation.goBack();
   const [loading, setLoading] = useState(true);
-  const [walletAddress, setWalletAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState<IAddress | null>(null);
 
   useEffect(() => {
-    // Simulate fetching the wallet address, replace with your logic
-    setTimeout(() => {
-      setWalletAddress('test_wallet_address 111');
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const getAddress = async () => {
+      if (!network || !wallet) {
+        navigation.goBack();
+        return;
+      }
+      const walletAddress = await createAddress({ network, name: wallet.name });
+      console.log(walletAddress);
+      if (walletAddress) {
+        setWalletAddress(walletAddress);
+        setLoading(false);
+      }
+    };
+    getAddress();
+  }, [network, wallet]);
 
   const handleCopy = async () => {
-    Clipboard.setStringAsync(walletAddress);
+    Clipboard.setStringAsync(walletAddress?.address || '');
     onToggleSnackBar();
   };
 
   const handleShare = async () => {
     try {
       Share.share({
-        message: `Deposit to my ${wallet?.currency} wallet: ${walletAddress}`,
+        message: `Deposit to my ${wallet?.currency} wallet: ${walletAddress?.address}, network: ${network}`,
       });
     } catch (error) {}
   };
@@ -58,7 +71,7 @@ const DepositAddress: React.FC<DepositAddressNavigationProp> = ({
       <Appbar.Header>
         <Appbar.BackAction onPress={_goBack} />
       </Appbar.Header>
-      {loading ? (
+      {loading || !walletAddress ? (
         <ActivityIndicator animating={true} />
       ) : (
         <View style={styles.container}>
@@ -80,16 +93,33 @@ const DepositAddress: React.FC<DepositAddressNavigationProp> = ({
               </Text>
             </View>
           </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 10,
+              padding: getResponsiveHeight(20),
+              backgroundColor: colors.elevation.level2,
+              borderRadius: 10,
+              marginVertical: getResponsiveHeight(20),
+            }}
+          >
+            <Icon source={'alert'} size={20} color={colors.primary} />
+            <Text style={{ flex: 1 }}>
+              Ensure you make deposit only to {wallet?.name} through the{' '}
+              {wallet?.network} network. Funds send to other network cannot be
+              retrieve
+            </Text>
+          </View>
           <View style={styles.qrCodeContainer}>
             <QRCode
-              value={walletAddress}
+              value={walletAddress?.address || ''}
               size={200}
               color="black"
               backgroundColor="white"
             />
           </View>
           <View style={styles.walletInfo}>
-            <Text style={styles.walletAddress}>{walletAddress}</Text>
+            <Text style={styles.walletAddress}>{walletAddress?.address}</Text>
           </View>
           <View
             style={{

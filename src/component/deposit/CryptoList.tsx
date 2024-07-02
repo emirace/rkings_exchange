@@ -16,7 +16,7 @@ const CryptoList: React.FC<CryptoListNavigationProp> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState<Wallet[]>([]);
   const scrollY = new Animated.Value(0);
-
+  console.log(type);
   // Function to render each item in the FlatList
   const renderItem = ({ item }: { item: Wallet }) => (
     <CardListItem

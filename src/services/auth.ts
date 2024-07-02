@@ -28,6 +28,30 @@ export async function sendVerifyEmailService(userData: {
   }
 }
 
+export async function sendVerifyOtpService(userData: {
+  email: string;
+}): Promise<any> {
+  try {
+    const data = await api.post('/users/send-otp', userData);
+
+    if (!data.status) {
+      const errorMessage = getBackendErrorMessage(data.data);
+      throw new Error(errorMessage);
+    }
+
+    return data.status;
+  } catch (error) {
+    // Handle network errors or other exceptions
+    // You can log the error or perform other error-handling actions
+    console.error('Registration error:', error);
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(errorMessage);
+    // Re-throw the error to propagate it up the call stack if needed
+    throw errorMessage;
+  }
+}
+
 export async function forgetPasswordService(userData: {
   email: string;
 }): Promise<any> {
@@ -53,6 +77,31 @@ export async function forgetPasswordService(userData: {
 }
 
 export async function verifyEmailService(tokenData: {
+  token: string;
+}): Promise<any> {
+  try {
+    const data = await api.post('/users/verify-email', tokenData);
+    console.log(data);
+
+    if (!data.status) {
+      const errorMessage = getBackendErrorMessage(data.data);
+      throw new Error(errorMessage);
+    }
+
+    return data.status;
+  } catch (error) {
+    // Handle network errors or other exceptions
+    // You can log the error or perform other error-handling actions
+    console.error('Registration error:', error);
+
+    const errorMessage = getBackendErrorMessage(error);
+    console.error(errorMessage);
+    // Re-throw the error to propagate it up the call stack if needed
+    throw errorMessage;
+  }
+}
+
+export async function verifyOtpService(tokenData: {
   token: string;
 }): Promise<any> {
   try {

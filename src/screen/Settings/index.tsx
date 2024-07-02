@@ -1,33 +1,11 @@
 import { View } from 'react-native';
-import React, { useState } from 'react';
-import {
-  Text,
-  Button,
-  Appbar,
-  List,
-  Modal,
-  Dialog,
-  useTheme,
-} from 'react-native-paper';
+import React from 'react';
+import { Appbar, List, useTheme } from 'react-native-paper';
 import { getResponsiveFontSize, getResponsiveWidth } from '../../utils/size';
-import { HomeScreenNavigationProp } from '../../type/navigation/stackNav';
-import useAuth from '../../context/AuthContext';
-import { HomeNavigationProp } from '../../type/navigation/bottomNav';
 
 const Settings: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const { user, logout } = useAuth();
-  const [visible, setVisible] = useState(false);
   const { colors } = useTheme();
 
-  const handleLogout = async () => {
-    await logout();
-    onDismiss();
-    navigation.navigate('Home');
-  };
-
-  const onDismiss = () => {
-    setVisible(false);
-  };
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Appbar.Header>
@@ -74,28 +52,7 @@ const Settings: React.FC<{ navigation: any }> = ({ navigation }) => {
             onPress={() => navigation.navigate('Appearance')}
           />
         </List.Section>
-        {user && (
-          <List.Item
-            title="Log out"
-            titleStyle={{
-              fontSize: getResponsiveFontSize(22),
-            }}
-            left={() => <List.Icon icon="logout" />}
-            onPress={() => setVisible(true)}
-          />
-        )}
       </View>
-
-      <Dialog visible={visible} onDismiss={onDismiss}>
-        <Dialog.Title>Logout</Dialog.Title>
-        <Dialog.Content>
-          <Text>Are you sure you want to logout?</Text>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={onDismiss}>Cancel</Button>
-          <Button onPress={handleLogout}>Logout</Button>
-        </Dialog.Actions>
-      </Dialog>
     </View>
   );
 };

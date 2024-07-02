@@ -15,9 +15,11 @@ import {
   loginUser,
   logoutUser,
   sendVerifyEmailService,
+  sendVerifyOtpService,
   updateUserByIdService,
   updateUserService,
   verifyEmailService,
+  verifyOtpService,
 } from '../services/auth';
 import { UpdateFields, User } from '../type/user';
 import * as SecureStore from 'expo-secure-store';
@@ -33,6 +35,7 @@ const AuthContext = createContext<{
   authErrorModalOpen: boolean;
   setAuthErrorModalOpen: (value: boolean) => void;
   sendVerifyEmail: (credentials: { email: string }) => Promise<boolean>;
+  sendVerifyOtp: (credentials: { email: string }) => Promise<boolean>;
   verifyEmail: (credentials: { token: string }) => Promise<boolean>;
   createUserChangePassword: (tokenData: {
     password: string;
@@ -45,6 +48,7 @@ const AuthContext = createContext<{
   getUserById: (id: string) => Promise<User | null>;
   updateUser: (userData: UpdateFields) => Promise<User | null>;
   updateUserById: (id: string, userData: UpdateFields) => Promise<User | null>;
+  verifyOtp: (credentials: { token: string }) => Promise<boolean>;
   logout: () => void;
 } | null>(null);
 
@@ -53,7 +57,7 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authErrorModalOpen, setAuthErrorModalOpen] = useState(false);
+  const [authErrorModalOpen, setAuthErrorModalOpenActual] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleError = (error: any) => {
@@ -63,18 +67,36 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
     if (error === 'Token expired' || error === 'Invalid token') {
       setError('');
       // Set the state to open the auth error modal
-      setAuthErrorModalOpen(true);
+      setAuthErrorModalOpenActual(true);
     } else {
       setError(error || 'An error occurred.');
+    }
+  };
+
+  const setAuthErrorModalOpen = (value: boolean) => {
+    if (value) {
+      setAuthErrorModalOpenActual(true);
+      setUser(null);
+    } else {
+      setAuthErrorModalOpenActual(value);
     }
   };
 
   const sendVerifyEmail = async (userData: { email: string }) => {
     try {
       setError('');
-      setLoading(true);
       const response = await sendVerifyEmailService(userData);
-      setLoading(false);
+      return !!response;
+    } catch (error) {
+      handleError(error);
+      return false;
+    }
+  };
+
+  const sendVerifyOtp = async (userData: { email: string }) => {
+    try {
+      setError('');
+      const response = await sendVerifyOtpService(userData);
       return !!response;
     } catch (error) {
       handleError(error);
@@ -86,6 +108,17 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
     try {
       setError('');
       const response = await verifyEmailService(tokenData);
+      return !!response;
+    } catch (error) {
+      handleError(error);
+      return false;
+    }
+  };
+
+  const verifyOtp = async (tokenData: { token: string }) => {
+    try {
+      setError('');
+      const response = await verifyOtpService(tokenData);
       return !!response;
     } catch (error) {
       handleError(error);
@@ -114,7 +147,7 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
       const authenticatedToken = await loginUser(credentials);
       if (authenticatedToken) {
         setAuthToken(authenticatedToken);
-        setAuthErrorModalOpen(false);
+        setAuthErrorModalOpenActual(false);
         return true;
       }
       // setLoading(false);
@@ -247,8 +280,10 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
         loading,
         authErrorModalOpen,
         setAuthErrorModalOpen,
+        sendVerifyOtp,
         sendVerifyEmail,
         verifyEmail,
+        verifyOtp,
         createUserChangePassword,
         login,
         sendForgetPasswordEmail,

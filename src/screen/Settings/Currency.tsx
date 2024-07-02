@@ -38,7 +38,7 @@ const Currency: React.FC<CurrencyNavigationProp> = ({ navigation }) => {
             <Checkbox.Item
               key={option._id}
               label={option.currency}
-              labelStyle={{ fontSize: getResponsiveFontSize(22) }}
+              labelStyle={{ fontSize: getResponsiveFontSize(20) }}
               status={
                 baseCurrency.currency === option.currency
                   ? 'checked'

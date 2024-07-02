@@ -1,18 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Button, Icon } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Button, Text, Icon } from 'react-native-paper';
 
-const WithdrawalSuccess: React.FC = () => {
+const WithdrawalSuccess: React.FC<any> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Icon source={'check-circle'} size={100} color="#2ecc71" />
       <Text style={styles.title}>Withdrawal Successful!</Text>
-      <Text style={styles.details}>You have successfully withdrawn</Text>
+      <Text style={styles.details}>
+        You have successfully made a withdrawal
+      </Text>
 
       <Button
         mode="contained"
         style={styles.homeButton}
-        onPress={() => console.log('Navigate to Home')}
+        onPress={() => navigation.replace('HomeMain')}
       >
         Go to Home
       </Button>
@@ -41,10 +43,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 32,
     textAlign: 'center',
-    color: '#555',
   },
   homeButton: {
-    backgroundColor: '#3498db',
     marginTop: 20,
   },
 });

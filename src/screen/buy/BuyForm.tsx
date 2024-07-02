@@ -30,6 +30,7 @@ import CustomBackdrop from '../../component/CustomBackdrop';
 import { formatNumberWithCommasAndDecimals } from '../../utils/helper';
 import LoginModal from '../../component/auth/LoginModal';
 import useAuth from '../../context/AuthContext';
+import LoadingText from '../../component/LoadingText';
 
 const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
   const { systemWallets, baseCurrency, depositWallet, error } = useWallet();
@@ -46,6 +47,8 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
   const [exchangeLoading, setExchangeLoading] = useState(true);
   const cursorAnimation = useRef(new Animated.Value(0)).current;
   const [visible, setVisible] = React.useState(false);
+  const [inputError, setInputError] = useState('');
+  const [loadingPayment, setLoadingPayment] = useState(false);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef2 = useRef<BottomSheetModal>(null);
@@ -63,6 +66,7 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
   };
 
   const handleInput = (value: string) => {
+    setInputError('');
     setText(value);
   };
 
@@ -134,9 +138,10 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
   };
 
   const onApprove = async (value: any, method: string) => {
-    console.log(value);
+    console.log('flu result', value);
     bottomSheetModalRef2.current?.dismiss();
-    if (value.status === 'Completed' || value.status === 'successful') {
+    if (value.status === 'completed' || value.status === 'successful') {
+      setLoadingPayment(true);
       const result = await depositWallet(
         method,
         value.transaction_id,
@@ -150,10 +155,14 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
     } else {
       setVisible(true);
     }
+    setLoadingPayment(false);
   };
 
   const handleBuy = () => {
-    if (!text) return;
+    if (!text) {
+      setInputError('Enter a valid amount');
+      return;
+    }
     openBottomSheet2();
   };
 
@@ -265,10 +274,7 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
                 {exchangeLoading ? (
                   <ActivityIndicator size={10} />
                 ) : (
-                  formatNumberWithCommasAndDecimals(
-                    parseFloat(text) * exchange,
-                    9
-                  )
+                  formatNumberWithCommasAndDecimals(parseFloat(text) * exchange)
                 )}
               </Text>
               <Text variant="labelLarge">
@@ -279,7 +285,7 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
                 {exchangeLoading ? (
                   <ActivityIndicator size={10} />
                 ) : (
-                  formatNumberWithCommasAndDecimals(exchange, 9)
+                  formatNumberWithCommasAndDecimals(exchange)
                 )}{' '}
                 to{' '}
                 {getCurrencySymbol(
@@ -290,6 +296,9 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
             </View>
           )}
         </View>
+        {inputError && (
+          <Text style={{ color: colors.primary }}>{inputError}</Text>
+        )}
 
         <View style={{ marginBottom: getResponsiveHeight(20) }}>
           <CustomKeyboard onKeyPress={handleInput} />
@@ -347,6 +356,8 @@ const BuyForm: React.FC<BuyFormNavigationProp> = ({ navigation, route }) => {
           Try again
         </Button>
       </Modal>
+
+      <LoadingText loading={loadingPayment} />
 
       <BottomSheetModal
         ref={bottomSheetModalRef}

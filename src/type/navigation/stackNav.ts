@@ -11,6 +11,7 @@ export type RootStackParamList = {
   DepositFiatForm: { currency: string };
   DepositCryptoForm: { currency: string };
   DepositAddress: undefined;
+  WithdrawalAddress: undefined;
   Withdrawal: undefined;
   WithdrawalFiatForm: { currency: string };
   WithdrawalCryptoForm: { currency: string };
@@ -86,6 +87,11 @@ export type WithdrawalFiatFormNavigationProp = NativeStackScreenProps<
 export type WithdrawalCryptoFormNavigationProp = NativeStackScreenProps<
   RootStackParamList,
   'WithdrawalCryptoForm'
+>;
+
+export type WithdrawalAddressNavigationProp = NativeStackScreenProps<
+  RootStackParamList,
+  'WithdrawalAddress'
 >;
 
 export type DepositAddressNavigationProp = NativeStackScreenProps<

@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import {
   Divider,
   List as ListPaper,
@@ -7,43 +7,64 @@ import {
   Text,
   useTheme,
   Button,
-} from 'react-native-paper';
+  ActivityIndicator,
+} from "react-native-paper";
 import {
   getResponsiveFontSize,
   getResponsiveHeight,
   getResponsiveWidth,
-} from '../../utils/size';
-import { Wallet } from '../../type/wallet';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { getCurrencySymbol } from '../../utils/currency';
-import PayWithFlutterwave from 'flutterwave-react-native';
+} from "../../utils/size";
+import { Wallet } from "../../type/wallet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { getCurrencySymbol } from "../../utils/currency";
+import PayWithFlutterwave from "flutterwave-react-native";
 import {
   formatNumberWithCommasAndDecimals,
   generateTransactionRef,
-} from '../../utils/helper';
-import List from './List';
-import { Currency } from 'flutterwave-react-native/dist/FlutterwaveInit';
+} from "../../utils/helper";
+import List from "./List";
+import { Currency } from "flutterwave-react-native/dist/FlutterwaveInit";
+import { getFlutterwavekey } from "../../services/key";
 
 interface Props {
   amount: number;
   currency: string;
-  onApprove: (value: any, method: string) => void;
-  methods?: ('wallet' | 'card')[];
+  onApprove: (value: any, cardType: string, method?: string) => void;
+  methods?: ("wallet" | "card")[];
 }
 
 const PaymentMethod: React.FC<Props> = ({
   amount,
   currency,
   onApprove,
-  methods = ['wallet', 'card'],
+  methods = ["wallet", "card"],
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [loadingKey, setLoadingKey] = useState(true);
+  const [flutterwaveKey, setFlutterwaveKey] = useState("");
+  const [keyError, setKeyError] = useState("");
   const { colors } = useTheme();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const isWallet = methods.some((str) => str.includes('wallet'));
-  const isCard = methods.some((str) => str.includes('card'));
+  const isWallet = methods.some((str) => str.includes("wallet"));
+  const isCard = methods.some((str) => str.includes("card"));
+
+  useEffect(() => {
+    const getKey = async () => {
+      try {
+        setLoadingKey(true);
+        const key = await getFlutterwavekey();
+        setFlutterwaveKey(key);
+        console.log("key", key);
+        setLoadingKey(false);
+      } catch (error) {
+        setLoadingKey(false);
+        setKeyError(error as string);
+      }
+    };
+    getKey();
+  }, []);
 
   const openBottomSheet = () => {
     if (bottomSheetModalRef.current) {
@@ -52,10 +73,10 @@ const PaymentMethod: React.FC<Props> = ({
   };
 
   const handleClick = (value: string) => {
-    if (!isWallet && value === 'wallet') {
+    if (!isWallet && value === "wallet") {
       return;
     }
-    if ((!wallet || paymentMethod === 'wallet') && value === 'wallet') {
+    if ((!wallet || paymentMethod === "wallet") && value === "wallet") {
       openBottomSheet();
     } else {
       setPaymentMethod(value);
@@ -64,7 +85,7 @@ const PaymentMethod: React.FC<Props> = ({
 
   const handleWalletChange = (item: Wallet) => {
     setWallet(item);
-    setPaymentMethod('wallet');
+    setPaymentMethod("wallet");
     bottomSheetModalRef.current?.close();
   };
 
@@ -75,7 +96,7 @@ const PaymentMethod: React.FC<Props> = ({
       <View>
         <Text
           variant="headlineSmall"
-          style={{ fontWeight: 'bold', marginBottom: getResponsiveHeight(20) }}
+          style={{ fontWeight: "bold", marginBottom: getResponsiveHeight(20) }}
         >
           Payment Method {getCurrencySymbol(currency)}
           {formatNumberWithCommasAndDecimals(amount)}
@@ -87,25 +108,25 @@ const PaymentMethod: React.FC<Props> = ({
         >
           <View style={{ opacity: isWallet ? 1 : 0.3 }}>
             <ListPaper.Item
-              title={`Wallet${wallet ? ` (${wallet.currency})` : ''}`}
-              onPress={() => handleClick('wallet')}
+              title={`Wallet${wallet ? ` (${wallet.currency})` : ""}`}
+              onPress={() => handleClick("wallet")}
               left={() => (
                 <ListPaper.Icon
                   icon="wallet" // Replace with the actual icon name
-                  color={paymentMethod === 'wallet' ? colors.primary : ''}
+                  color={paymentMethod === "wallet" ? colors.primary : ""}
                 />
               )}
               disabled={!isWallet}
               right={() => (
                 <RadioButton
                   value="wallet"
-                  status={paymentMethod === 'wallet' ? 'checked' : 'unchecked'}
+                  status={paymentMethod === "wallet" ? "checked" : "unchecked"}
                   color={colors.primary}
                 />
               )}
               titleStyle={{
                 fontSize: getResponsiveFontSize(20),
-                fontWeight: '600',
+                fontWeight: "600",
               }}
               style={{ padding: 10 }}
             />
@@ -115,24 +136,24 @@ const PaymentMethod: React.FC<Props> = ({
           <View>
             <ListPaper.Item
               title="Card/Bank transfer"
-              onPress={() => setPaymentMethod('card')}
+              onPress={() => setPaymentMethod("card")}
               left={() => (
                 <ListPaper.Icon
                   icon="credit-card" // Replace with the actual icon name
-                  color={paymentMethod === 'card' ? colors.primary : ''}
+                  color={paymentMethod === "card" ? colors.primary : ""}
                 />
               )}
               disabled={!isCard}
               right={() => (
                 <RadioButton
                   value="card"
-                  status={paymentMethod === 'card' ? 'checked' : 'unchecked'}
+                  status={paymentMethod === "card" ? "checked" : "unchecked"}
                   color={colors.primary}
                 />
               )}
               titleStyle={{
                 fontSize: getResponsiveFontSize(20),
-                fontWeight: '600',
+                fontWeight: "600",
               }}
               style={{ padding: 10 }}
             />
@@ -141,11 +162,11 @@ const PaymentMethod: React.FC<Props> = ({
         </RadioButton.Group>
       </View>
 
-      {paymentMethod === 'wallet' ? (
+      {paymentMethod === "wallet" ? (
         <Button
           mode="contained"
           labelStyle={{
-            fontWeight: '800',
+            fontWeight: "800",
           }}
           onPress={handlePayment}
           uppercase
@@ -154,40 +175,46 @@ const PaymentMethod: React.FC<Props> = ({
         >
           Continue
         </Button>
-      ) : paymentMethod === 'card' ? (
-        <PayWithFlutterwave
-          onRedirect={(e) => onApprove(e, paymentMethod)}
-          options={{
-            tx_ref: generateTransactionRef(10),
-            authorization: 'FLWPUBK_TEST-6a1e30713a8c6962ecb7d6cfbda2df69-X',
-            customer: {
-              email: 'customer-email@example.com',
-            },
-            amount,
-            currency: currency as Currency,
-            payment_options: 'card',
-          }}
-          customButton={(props) => (
-            <Button
-              mode="contained"
-              labelStyle={{
-                fontWeight: '800',
-              }}
-              uppercase
-              style={{ borderRadius: 5 }}
-              onPress={props.onPress}
-              disabled={props.disabled}
-              contentStyle={{ height: getResponsiveHeight(50) }}
-            >
-              Continue
-            </Button>
-          )}
-        />
+      ) : paymentMethod === "card" ? (
+        loadingKey ? (
+          <ActivityIndicator size={15} />
+        ) : keyError ? (
+          <Text style={{ color: "red" }}>{keyError}</Text>
+        ) : (
+          <PayWithFlutterwave
+            onRedirect={(e) => onApprove(e, "flutterwave", "card")}
+            options={{
+              tx_ref: generateTransactionRef(10),
+              authorization: "FLWPUBK_TEST-6a1e30713a8c6962ecb7d6cfbda2df69-X",
+              customer: {
+                email: "customer-email@example.com",
+              },
+              amount,
+              currency: currency as Currency,
+              payment_options: "card",
+            }}
+            customButton={(props) => (
+              <Button
+                mode="contained"
+                labelStyle={{
+                  fontWeight: "800",
+                }}
+                uppercase
+                style={{ borderRadius: 5 }}
+                onPress={props.onPress}
+                disabled={props.disabled}
+                contentStyle={{ height: getResponsiveHeight(50) }}
+              >
+                Continue
+              </Button>
+            )}
+          />
+        )
       ) : null}
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
-        snapPoints={['90%']}
+        snapPoints={["90%"]}
         backgroundStyle={{
           backgroundColor: colors.elevation.level1,
         }}
@@ -206,7 +233,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: getResponsiveWidth(20),
     paddingVertical: getResponsiveHeight(20),
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     flex: 1,
     paddingBottom: getResponsiveHeight(30),
   },

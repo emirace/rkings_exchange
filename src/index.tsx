@@ -29,6 +29,7 @@ import { StatusBar } from 'expo-status-bar';
 import { CandlesProvider } from './context/CandlesContext';
 import { VerificationProvider } from './context/VerificationContext';
 import { TransactionProvider } from './context/TransactionContext';
+import { AddressProvider } from './context/AddressContext';
 
 const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -67,7 +68,9 @@ const Main = () => {
                               <BottomSheetModalProvider>
                                 <CandlesProvider>
                                   <TransactionProvider>
-                                    <MainStackNav />
+                                    <AddressProvider>
+                                      <MainStackNav />
+                                    </AddressProvider>
                                   </TransactionProvider>
                                 </CandlesProvider>
                               </BottomSheetModalProvider>

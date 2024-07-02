@@ -9,43 +9,20 @@ import {
   Card,
   Divider,
   Icon,
+  IconButton,
 } from 'react-native-paper';
-import { Wallet } from '../../../type/wallet';
-import {
-  getResponsiveFontSize,
-  getResponsiveHeight,
-} from '../../../utils/size';
-import { DepositCryptoFormNavigationProp } from '../../../type/navigation/stackNav';
-import { data } from '../../../constant/data';
-import { useDeposit } from '../../../context/DepositContext';
-import { useWallet } from '../../../context/WalletContext';
+import { Wallet } from '../../type/wallet';
+import { getResponsiveFontSize, getResponsiveHeight } from '../../utils/size';
+import { baseURL } from '../../services/api';
 
-const DepositCryptoForm: React.FC<DepositCryptoFormNavigationProp> = ({
-  navigation,
-  route,
-}) => {
-  const { systemWallets } = useWallet();
-  const _goBack = () => navigation.goBack();
-  const { wallet, updateWallet, updateNetwork } = useDeposit();
-  const currency = route.params.currency;
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (currency) {
-      setLoading(true);
-      const currentWallet = systemWallets.find(
-        (wal) => wal.currency === currency
-      );
-      if (currentWallet) {
-        updateWallet(currentWallet);
-      }
-      setLoading(false);
-    }
-  }, [currency]);
-
+interface Props {
+  wallet: Wallet | null;
+  onClick: (value: string) => void;
+  closeModal: () => void;
+}
+const SelectNetwork: React.FC<Props> = ({ wallet, onClick, closeModal }) => {
   const handleClick = (value: string) => {
-    updateNetwork(value);
-    navigation.navigate('DepositAddress');
+    onClick(value);
   };
 
   // Function to render each item in the flat List
@@ -73,17 +50,13 @@ const DepositCryptoForm: React.FC<DepositCryptoFormNavigationProp> = ({
     </>
   );
 
-  return loading ? (
-    <ActivityIndicator animating={true} />
-  ) : !wallet ? (
+  return !wallet ? (
     <HelperText type="error" visible={!wallet}>
       Invalid Currency
     </HelperText>
   ) : (
     <View style={{ flex: 1 }}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={_goBack} />
-      </Appbar.Header>
+      <IconButton icon="chevron-left" onPress={closeModal} size={25} />
       <View
         style={{
           flex: 1,
@@ -99,14 +72,14 @@ const DepositCryptoForm: React.FC<DepositCryptoFormNavigationProp> = ({
           }}
         >
           <Avatar.Image
-            source={{ uri: wallet.image }}
+            source={{ uri: baseURL + wallet.image }}
             size={getResponsiveHeight(20)}
           />
           <Text
             variant="titleLarge"
             style={{ fontWeight: '600', fontSize: getResponsiveFontSize(22) }}
           >
-            Deposit {currency}
+            Add {wallet.name} wallet
           </Text>
         </View>
         <View
@@ -168,4 +141,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DepositCryptoForm;
+export default SelectNetwork;

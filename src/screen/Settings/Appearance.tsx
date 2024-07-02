@@ -32,7 +32,7 @@ const Appearance: React.FC<AppearanceNavigationProp> = ({ navigation }) => {
           <Checkbox.Item
             label={option}
             key={option}
-            labelStyle={{ fontSize: getResponsiveFontSize(22) }}
+            labelStyle={{ fontSize: getResponsiveFontSize(20) }}
             status={
               selectedThemeMode === option.toLowerCase()
                 ? 'checked'

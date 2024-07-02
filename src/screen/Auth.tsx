@@ -32,6 +32,7 @@ import Signup from '../component/auth/Signup';
 import { AuthNavigationProp } from '../type/navigation/stackNav';
 import ForgetPassword from '../component/auth/ForgetPassword';
 import useAuth from '../context/AuthContext';
+import Step from '../component/auth/Signup/step';
 
 interface OnboardingItem {
   id: string;
@@ -76,10 +77,12 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
   const { colors } = useTheme();
   const { loading, user } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [email, setEmail] = useState('');
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef2 = useRef<BottomSheetModal>(null);
   const bottomSheetModalRef3 = useRef<BottomSheetModal>(null);
+  const bottomSheetModalRef4 = useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     if (user) {
@@ -105,6 +108,12 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
     }
   };
 
+  const openBottomSheet4 = () => {
+    if (bottomSheetModalRef4.current) {
+      bottomSheetModalRef4.current.present();
+    }
+  };
+
   const gotoLogin = () => {
     if (bottomSheetModalRef2.current) {
       bottomSheetModalRef2.current.dismiss();
@@ -113,7 +122,24 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
     if (bottomSheetModalRef3.current) {
       bottomSheetModalRef3.current.dismiss();
     }
+    if (bottomSheetModalRef4.current) {
+      bottomSheetModalRef4.current.dismiss();
+    }
     openBottomSheet();
+  };
+
+  const gotoSignUp = () => {
+    if (bottomSheetModalRef.current) {
+      bottomSheetModalRef.current.dismiss();
+    }
+
+    if (bottomSheetModalRef3.current) {
+      bottomSheetModalRef3.current.dismiss();
+    }
+    if (bottomSheetModalRef4.current) {
+      bottomSheetModalRef4.current.dismiss();
+    }
+    openBottomSheet2();
   };
 
   const gotoForgetPassword = () => {
@@ -124,12 +150,54 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
     if (bottomSheetModalRef.current) {
       bottomSheetModalRef.current.dismiss();
     }
+
+    if (bottomSheetModalRef4.current) {
+      bottomSheetModalRef4.current.dismiss();
+    }
+
     openBottomSheet23();
+  };
+
+  const gotoToken = () => {
+    if (bottomSheetModalRef2.current) {
+      bottomSheetModalRef2.current.dismiss();
+    }
+
+    if (bottomSheetModalRef.current) {
+      bottomSheetModalRef.current.dismiss();
+    }
+
+    if (bottomSheetModalRef3.current) {
+      bottomSheetModalRef3.current.dismiss();
+    }
+
+    openBottomSheet4();
   };
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 20,
+        }}
+      >
+        <Image
+          source={require('../../assets/icon.png')}
+          style={{
+            width: WIDTH * 0.5,
+            height: WIDTH * 0.5,
+            objectFit: 'contain',
+          }}
+          alt="logo"
+        />
+        <Text
+          style={{ fontWeight: '800', fontSize: 40, color: colors.primary }}
+        >
+          RKings Exchange
+        </Text>
         <ActivityIndicator />
       </View>
     );
@@ -281,7 +349,12 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
         }}
         backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
-        <Signup gotoLogin={gotoLogin} />
+        <Signup
+          gotoLogin={gotoLogin}
+          gotoToken={gotoToken}
+          email={email}
+          setEmail={setEmail}
+        />
       </BottomSheetModal>
 
       <BottomSheetModal
@@ -298,6 +371,23 @@ const OnboardingScreen: React.FC<AuthNavigationProp> = ({
         backdropComponent={(props) => <CustomBackdrop {...props} />}
       >
         <ForgetPassword gotoLogin={gotoLogin} />
+      </BottomSheetModal>
+
+      <BottomSheetModal
+        ref={bottomSheetModalRef4}
+        index={0}
+        snapPoints={['100%']}
+        backgroundStyle={{
+          backgroundColor: colors.background,
+        }}
+        enablePanDownToClose={false}
+        handleComponent={null}
+        handleIndicatorStyle={{
+          backgroundColor: colors.primary,
+        }}
+        backdropComponent={(props) => <CustomBackdrop {...props} />}
+      >
+        <Step gotoSignUp={gotoSignUp} gotoLogin={gotoLogin} email={email} />
       </BottomSheetModal>
     </View>
   );

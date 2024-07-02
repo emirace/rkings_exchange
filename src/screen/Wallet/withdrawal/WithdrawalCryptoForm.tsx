@@ -8,6 +8,7 @@ import {
   Text,
   Card,
   Divider,
+  Icon,
 } from 'react-native-paper';
 import { Wallet } from '../../../type/wallet';
 import {
@@ -15,7 +16,6 @@ import {
   getResponsiveHeight,
 } from '../../../utils/size';
 import { WithdrawalCryptoFormNavigationProp } from '../../../type/navigation/stackNav';
-import { data } from '../../../constant/data';
 import { useDeposit } from '../../../context/DepositContext';
 import { useWallet } from '../../../context/WalletContext';
 
@@ -25,7 +25,7 @@ const WithdrawalCryptoForm: React.FC<WithdrawalCryptoFormNavigationProp> = ({
 }) => {
   const { systemWallets } = useWallet();
   const _goBack = () => navigation.goBack();
-  const { wallet, updateWallet, network, updateNetwork } = useDeposit();
+  const { wallet, updateWallet, updateNetwork } = useDeposit();
   const currency = route.params.currency;
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +44,7 @@ const WithdrawalCryptoForm: React.FC<WithdrawalCryptoFormNavigationProp> = ({
 
   const handleClick = (value: string) => {
     updateNetwork(value);
-    navigation.navigate('DepositAddress');
+    navigation.navigate('WithdrawalAddress');
   };
 
   // Function to render each item in the flat List
@@ -59,11 +59,12 @@ const WithdrawalCryptoForm: React.FC<WithdrawalCryptoFormNavigationProp> = ({
         <Card.Content style={styles.cardContent}>
           <View style={styles.textContainer}>
             <Text style={styles.currencyFullName}>{item}</Text>
-            <Text style={styles.currencyName}>0.00001</Text>
-            <Text style={styles.currencyName}>60mins</Text>
+            {/* <Text style={styles.currencyName}>0.00001</Text>
+            <Text style={styles.currencyName}>60mins</Text> */}
           </View>
           <View style={styles.rateContainer}>
             {/* <Text style={styles.currencyRate}>60mins</Text> */}
+            <Icon source={'chevron-right'} size={24} />
           </View>
         </Card.Content>
       </Card>
@@ -104,7 +105,7 @@ const WithdrawalCryptoForm: React.FC<WithdrawalCryptoFormNavigationProp> = ({
             variant="titleLarge"
             style={{ fontWeight: '600', fontSize: getResponsiveFontSize(22) }}
           >
-            Deposit {currency}
+            Withdrawal {currency}
           </Text>
         </View>
         <View
@@ -116,7 +117,7 @@ const WithdrawalCryptoForm: React.FC<WithdrawalCryptoFormNavigationProp> = ({
         </View>
 
         <FlatList
-          data={['bitcoin']}
+          data={wallet.network || []}
           keyExtractor={(item) => item}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
